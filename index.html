@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TABATA</title>
+<meta name="theme-color" content="#0A0A0F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TABATA">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-app.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-app.svg">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -603,8 +610,8 @@
 <div class="app-wrapper">
   <!-- TAB NAV -->
   <nav class="tab-nav">
-    <button class="tab-btn active" onclick="showTab('timer')">⏱ 타이머</button>
-    <button class="tab-btn" onclick="showTab('settings')">⚙ 설정</button>
+    <button class="tab-btn active" onclick="showTab('timer', this)">⏱ 타이머</button>
+    <button class="tab-btn" onclick="showTab('settings', this)">⚙ 설정</button>
   </nav>
 
   <!-- ===== TIMER PANEL ===== -->
@@ -917,6 +924,7 @@ let voices = [];
 const TTS = window.speechSynthesis || null;
 let audioCtx = null;
 let audioUnlocked = false;
+const STORAGE_KEY = 'tabata-voice-coach-settings-v1';
 
 // ===== AudioContext: unlock on first user gesture =====
 function unlockAudio() {
@@ -964,6 +972,27 @@ function beep(type) {
   }
 }
 
+function loadSettings() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    cfg = { ...cfg, ...saved };
+  } catch (e) {
+    console.warn('Failed to load settings:', e);
+  }
+}
+
+function persistSettings() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg));
+  } catch (e) {
+    console.warn('Failed to persist settings:', e);
+  }
+}
+
+loadSettings();
+
 // ===== INIT TTS voices =====
 function loadVoices() {
   if (!TTS) return;
@@ -978,7 +1007,14 @@ function loadVoices() {
     sel.appendChild(o);
   });
   const koIdx = voices.findIndex(v => v.lang.startsWith('ko'));
-  if (koIdx >= 0) { sel.value = koIdx; cfg.voiceIdx = koIdx; }
+  if (cfg.voiceIdx >= 0 && voices[cfg.voiceIdx]) {
+    sel.value = String(cfg.voiceIdx);
+  } else if (koIdx >= 0) {
+    sel.value = String(koIdx);
+    cfg.voiceIdx = koIdx;
+  } else {
+    sel.value = '-1';
+  }
 }
 
 if (TTS) {
@@ -1024,11 +1060,11 @@ function initUI() {
 initUI();
 
 // ===== TABS =====
-function showTab(id) {
+function showTab(id, btn) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
-  event.currentTarget.classList.add('active');
+  if (btn) btn.classList.add('active');
 }
 
 // ===== SETTINGS =====
@@ -1065,10 +1101,10 @@ function saveSettings() {
   cfg.repTotal = parseInt(document.getElementById('repTotalVal').textContent) || 10;
   cfg.repMode = document.querySelector('input[name="repMode"]:checked')?.value || 'up';
   cfg.repCue = document.getElementById('repCue').value || '{count}';
+  persistSettings();
 
   resetTimer();
-  showTab('timer');
-  document.querySelector('.tab-btn').classList.add('active');
+  showTab('timer', document.querySelector('.tab-btn'));
   document.querySelectorAll('.tab-btn')[1].classList.remove('active');
 }
 
@@ -1480,6 +1516,45 @@ function finishTabata() {
 function closeComplete() {
   document.getElementById('completeOverlay').classList.remove('show');
   resetTimer();
+}
+
+function syncSettingsToUI() {
+  document.getElementById('voiceEnabled').checked = cfg.voiceEnabled;
+  document.getElementById('rateRange').value = String(cfg.rate);
+  document.getElementById('pitchRange').value = String(cfg.pitch);
+  document.getElementById('volRange').value = String(cfg.vol);
+  document.getElementById('workCue').value = cfg.workCue;
+  document.getElementById('restCue').value = cfg.restCue;
+  document.getElementById('countdownCue').value = cfg.countdownCue;
+  document.getElementById('countdownCueEnabled').checked = cfg.countdownCueEnabled;
+  document.getElementById('completeCue').value = cfg.completeCue;
+  document.getElementById('countAnnounce').checked = cfg.countAnnounce;
+  document.getElementById('countIntervalVal').textContent = cfg.countInterval;
+  document.getElementById('repEnabled').checked = cfg.repEnabled;
+  document.getElementById('repTotalVal').textContent = cfg.repTotal;
+  document.getElementById('repCue').value = cfg.repCue;
+  updateRange('rate');
+  updateRange('pitch');
+  updateRange('vol');
+
+  const countPhase = document.querySelector(`input[name="countPhase"][value="${cfg.countPhase}"]`);
+  if (countPhase) countPhase.checked = true;
+
+  const repMode = document.querySelector(`input[name="repMode"][value="${cfg.repMode}"]`);
+  if (repMode) repMode.checked = true;
+
+  toggleCountOptions();
+  toggleRepOptions();
+}
+
+syncSettingsToUI();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch((err) => {
+      console.warn('Service worker registration failed:', err);
+    });
+  });
 }
 </script>
 </body>
