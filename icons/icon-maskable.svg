@@ -1,18 +1,39 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
-    <radialGradient id="bg" cx="50%" cy="35%" r="80%">
-      <stop offset="0%" stop-color="#202030"/>
-      <stop offset="100%" stop-color="#08080C"/>
+    <linearGradient id="bg" x1="6%" y1="6%" x2="94%" y2="94%">
+      <stop offset="0%" stop-color="#fff9fc"/>
+      <stop offset="50%" stop-color="#fff0f7"/>
+      <stop offset="100%" stop-color="#eefbf7"/>
+    </linearGradient>
+    <radialGradient id="washPink" cx="24%" cy="18%" r="62%">
+      <stop offset="0%" stop-color="#ff88aa" stop-opacity=".5"/>
+      <stop offset="100%" stop-color="#ff88aa" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FF7B00"/>
-      <stop offset="100%" stop-color="#FF3D00"/>
+    <radialGradient id="washGold" cx="78%" cy="18%" r="44%">
+      <stop offset="0%" stop-color="#ffd17d" stop-opacity=".34"/>
+      <stop offset="100%" stop-color="#ffd17d" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="washMint" cx="78%" cy="82%" r="54%">
+      <stop offset="0%" stop-color="#65d8c5" stop-opacity=".42"/>
+      <stop offset="100%" stop-color="#65d8c5" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="18%" y1="14%" x2="82%" y2="88%">
+      <stop offset="0%" stop-color="#ff7d9f"/>
+      <stop offset="100%" stop-color="#47c9b6"/>
+    </linearGradient>
+    <linearGradient id="pulse" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#ff89aa"/>
+      <stop offset="100%" stop-color="#50d1be"/>
     </linearGradient>
   </defs>
   <rect width="512" height="512" fill="url(#bg)"/>
-  <circle cx="256" cy="256" r="170" fill="none" stroke="#171724" stroke-width="26"/>
-  <circle cx="256" cy="256" r="170" fill="none" stroke="url(#accent)" stroke-width="26" stroke-linecap="round" stroke-dasharray="800 1068" transform="rotate(-90 256 256)"/>
-  <circle cx="256" cy="256" r="104" fill="#0F0F18"/>
-  <path d="M255 168c-10 0-18 8-18 18v74h-38c-10 0-18 8-18 18s8 18 18 18h56c10 0 18-8 18-18v-92c0-10-8-18-18-18Z" fill="#F0F0F8"/>
-  <rect x="220" y="78" width="72" height="32" rx="16" fill="#00E5FF"/>
+  <rect width="512" height="512" fill="url(#washPink)"/>
+  <rect width="512" height="512" fill="url(#washGold)"/>
+  <rect width="512" height="512" fill="url(#washMint)"/>
+  <circle cx="256" cy="256" r="172" fill="none" stroke="#ffffff" stroke-opacity=".9" stroke-width="44"/>
+  <circle cx="256" cy="256" r="172" fill="none" stroke="url(#ring)" stroke-width="30" stroke-linecap="round" stroke-dasharray="582 1080" transform="rotate(-92 256 256)"/>
+  <circle cx="256" cy="256" r="128" fill="#ffffff" fill-opacity=".8" stroke="#f1dce7" stroke-width="3"/>
+  <path d="M128 270c21 0 30-51 47-51 16 0 20 87 36 87 13 0 19-31 31-31h26c10 0 18 8 18 18s-8 18-18 18h-42c-14 0-19 24-29 24-18 0-25-81-38-81-11 0-16 41-34 41h-21c-10 0-18-8-18-18s8-18 18-18h24Z" fill="url(#pulse)"/>
+  <circle cx="358" cy="170" r="24" fill="#fff7fa" stroke="#ff8cad" stroke-width="10"/>
+  <circle cx="358" cy="170" r="7" fill="#ff8cad"/>
 </svg>
