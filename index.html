@@ -1674,6 +1674,7 @@
           <div class="section-title">Quick Notes</div>
           <div class="section-copy">
             운동/휴식 길이와 라운드 수는 즉시 미리보기 값에 반영됩니다.
+            운동 시간과 목표 횟수를 함께 쓰면 1회당 운동 시간은 `운동 시간 ÷ 목표 횟수`로 계산됩니다.
             TTS 음성은 브라우저별로 지원 상태가 다를 수 있습니다.
           </div>
         </div>
@@ -1790,7 +1791,7 @@
             <div class="setting-row">
               <div style="flex:1;min-width:0;">
                 <div class="setting-label">휴식 시작 음성</div>
-                <div class="setting-sub">라운드 종료 직후 "00초 쉴게" 안내</div>
+                <div class="setting-sub">라운드 종료 직후 "00초 쉴게요" 안내</div>
               </div>
               <label class="toggle">
                 <input type="checkbox" id="restCueEnabled" checked>
@@ -1803,7 +1804,7 @@
                 <div class="voice-type-label"><span class="dot-rest"></span> 휴식 시작 안내</div>
                 <button class="test-btn" onclick="testSpeak('rest')">🔊 테스트</button>
               </div>
-              <textarea class="voice-textarea" id="restCue" placeholder="예: {rest}초 쉴게" rows="2">[any] {rest}초 쉴게.</textarea>
+                <textarea class="voice-textarea" id="restCue" placeholder="예: {rest}초 쉴게요" rows="2">[any] {rest}초 쉴게요.</textarea>
               <div class="voice-hint">💡 변수 사용 가능: <code style="color:#00E5FF">{rest}</code> = 휴식 초, <code style="color:#00E5FF">{round}</code>, <code style="color:#00E5FF">{total}</code></div>
             </div>
 
@@ -1927,7 +1928,7 @@ let cfg = {
 [late] {round}라운드 시작. 거의 다 왔어요. 이번도 충분히 할 수 있어요.
 [last] {round}라운드 시작. 마지막까지 정말 잘 오고 있어요.`,
   restCueEnabled: true,
-  restCue: `[any] {rest}초 쉴게.`,
+  restCue: `[any] {rest}초 쉴게요.`,
   countdownCue: `[any] {next}라운드 준비.`,
   countdownCueEnabled: true,
   completeCue: `[any] 오늘도 해냈어요. 정말 잘했어요!
@@ -1997,7 +1998,7 @@ const REFRESHED_CUES = {
 [mid] {round}라운드 시작. 좋아요, 이 흐름 그대로 가요.
 [late] {round}라운드 시작. 거의 다 왔어요. 이번도 충분히 할 수 있어요.
 [last] {round}라운드 시작. 마지막까지 정말 잘 오고 있어요.`,
-  restCue: `[any] {rest}초 쉴게.`,
+  restCue: `[any] {rest}초 쉴게요.`,
   countdownCue: `[any] {next}라운드 준비.`,
   completeCue: `[any] 오늘도 해냈어요. 정말 잘했어요!
 [any] 짧아도 충분히 의미 있었어요. 오늘 루틴 성공이에요.
