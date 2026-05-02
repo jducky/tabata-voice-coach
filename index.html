@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TABATA</title>
-<meta name="theme-color" content="#0A0A0F">
+<meta name="theme-color" content="#fff7fb">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TABATA">
@@ -16,139 +16,369 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --work-color: #FF3D00;
-    --rest-color: #00E5FF;
-    --bg: #0A0A0F;
-    --surface: #12121A;
-    --surface2: #1C1C28;
-    --text: #F0F0F8;
-    --text-dim: #6B6B8A;
-    --accent: #FF3D00;
+    --work-color: #ff6f91;
+    --rest-color: #48cbb7;
+    --ready-color: #ffbf69;
+    --bg: #fff7fb;
+    --bg-strong: #ffeef6;
+    --surface: rgba(255,255,255,0.82);
+    --surface-strong: rgba(255,255,255,0.94);
+    --surface-muted: rgba(120, 73, 108, 0.05);
+    --line: rgba(120, 73, 108, 0.12);
+    --text: #3e2b38;
+    --text-dim: #8f7083;
+    --shadow: 0 22px 60px rgba(226, 148, 183, 0.18);
+    --radius-xl: 32px;
+    --radius-lg: 22px;
+    --radius-md: 16px;
   }
+
+  html { background: var(--bg); }
 
   body {
     font-family: 'Noto Sans KR', sans-serif;
-    background: var(--bg);
     color: var(--text);
-    min-height: 100vh;
+    min-height: 100dvh;
     overflow-x: hidden;
+    background:
+      radial-gradient(circle at top left, rgba(255, 111, 145, 0.18), transparent 34%),
+      radial-gradient(circle at right 14%, rgba(72, 203, 183, 0.14), transparent 28%),
+      radial-gradient(circle at bottom left, rgba(255, 191, 105, 0.16), transparent 24%),
+      linear-gradient(180deg, #fffafd 0%, #fff4fa 46%, #fff0f7 100%);
   }
 
-  /* NOISE TEXTURE */
-  body::before {
+  body::before,
+  body::after {
     content: '';
     position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    border-radius: 50%;
     pointer-events: none;
-    z-index: 1000;
-    opacity: 0.4;
+    z-index: 0;
+    filter: blur(12px);
   }
 
-  /* TABS */
+  body::before {
+    width: 360px;
+    height: 360px;
+    top: -140px;
+    right: -120px;
+    background: rgba(255, 111, 145, 0.16);
+  }
+
+  body::after {
+    width: 280px;
+    height: 280px;
+    left: -100px;
+    bottom: 10%;
+    background: rgba(72, 203, 183, 0.12);
+  }
+
   .app-wrapper {
-    max-width: 480px;
+    position: relative;
+    z-index: 1;
+    max-width: 1180px;
     width: 100%;
+    min-height: 100dvh;
     margin: 0 auto;
-    min-height: 100vh;
+    padding: calc(18px + env(safe-area-inset-top, 0px)) 18px calc(24px + env(safe-area-inset-bottom, 0px));
     display: flex;
     flex-direction: column;
-    background: var(--bg);
+    gap: 18px;
   }
 
   .tab-nav {
-    display: flex;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    background: var(--surface);
     position: sticky;
-    top: 0;
+    top: 18px;
     z-index: 100;
+    display: inline-flex;
+    align-self: center;
+    gap: 8px;
+    padding: 8px;
+    background: rgba(255,255,255,0.72);
+    border: 1px solid rgba(255,255,255,0.55);
+    border-radius: 999px;
+    box-shadow: 0 18px 50px rgba(120, 79, 42, 0.12);
+    backdrop-filter: blur(18px);
   }
 
   .tab-btn {
-    flex: 1;
-    padding: 16px;
-    background: none;
+    min-width: 132px;
+    padding: 12px 18px;
     border: none;
+    border-radius: 999px;
+    background: transparent;
     color: var(--text-dim);
-    font-family: 'Noto Sans KR', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
+    font: 600 13px 'Noto Sans KR', sans-serif;
+    letter-spacing: 0.04em;
     cursor: pointer;
-    position: relative;
-    transition: color 0.2s;
-    letter-spacing: 0.05em;
-  }
-  .tab-btn.active { color: var(--text); }
-  .tab-btn.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 16px; right: 16px;
-    height: 2px;
-    background: var(--work-color);
+    transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
   }
 
-  .tab-panel { display: none; flex: 1; flex-direction: column; }
-  .tab-panel.active { display: flex; }
+  .tab-btn:hover {
+    color: var(--text);
+    transform: translateY(-1px);
+  }
 
-  /* ===== TIMER TAB ===== */
+  .tab-btn.active {
+    color: #fffaff;
+    background: linear-gradient(135deg, #ff7ea5 0%, #ff98b7 100%);
+    box-shadow: 0 10px 26px rgba(255, 126, 165, 0.28);
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: panel-in 0.28s ease; }
+
   .timer-section {
-    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(260px, 360px) minmax(340px, 1fr);
+    gap: 24px;
+    align-items: stretch;
+  }
+
+  .hero-panel,
+  .timer-stage,
+  .settings-card,
+  .voice-block,
+  .complete-overlay > *:not(script) {
+    box-shadow: var(--shadow);
+  }
+
+  .hero-panel {
+    padding: 28px;
+    border-radius: var(--radius-xl);
+    background:
+      linear-gradient(155deg, rgba(255,255,255,0.92), rgba(255,242,248,0.86)),
+      linear-gradient(130deg, rgba(255, 111, 145, 0.08), rgba(72, 203, 183, 0.06));
+    border: 1px solid rgba(255,255,255,0.62);
+    backdrop-filter: blur(18px);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    gap: 0;
-    position: relative;
+    justify-content: space-between;
+    gap: 22px;
   }
 
-  /* Phase indicator */
-  .phase-label {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
-    letter-spacing: 0.3em;
+  .hero-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(34, 22, 15, 0.06);
     color: var(--text-dim);
-    margin-bottom: 12px;
-    transition: color 0.4s;
-    min-height: 28px;
+    font: 700 11px 'JetBrains Mono', monospace;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
+
+  .hero-title {
+    margin-top: 18px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(58px, 8vw, 88px);
+    line-height: 0.92;
+    letter-spacing: 0.04em;
+    color: #5a3750;
+  }
+
+  .hero-lead {
+    margin-top: 14px;
+    color: var(--text-dim);
+    font-size: 15px;
+    line-height: 1.75;
+    max-width: 28ch;
+  }
+
+  .hero-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .hero-stat {
+    padding: 16px;
+    border-radius: var(--radius-md);
+    background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(255,255,255,0.58);
+  }
+
+  .hero-stat-label {
+    font: 700 11px 'JetBrains Mono', monospace;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .hero-stat-value {
+    margin-top: 8px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 0.04em;
+    color: #2b1a10;
+  }
+
+  .hero-stat-copy {
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .timer-stage {
+    border-radius: 38px;
+    padding: 28px;
+    background:
+      radial-gradient(circle at top right, rgba(255, 126, 165, 0.22), transparent 34%),
+      radial-gradient(circle at bottom left, rgba(72, 203, 183, 0.18), transparent 30%),
+      linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,247,251,0.98) 100%);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    min-height: 640px;
+    border: 1px solid rgba(255,255,255,0.72);
+  }
+
+  .timer-stage.state-prep {
+    box-shadow: inset 0 0 0 1px rgba(255, 191, 105, 0.24), 0 26px 60px rgba(255, 191, 105, 0.12);
+  }
+
+  .timer-stage.state-work {
+    box-shadow: inset 0 0 0 1px rgba(255, 111, 145, 0.28), 0 30px 72px rgba(255, 111, 145, 0.16);
+  }
+
+  .timer-stage.state-rest {
+    box-shadow: inset 0 0 0 1px rgba(72, 203, 183, 0.28), 0 30px 72px rgba(72, 203, 183, 0.14);
+  }
+
+  .timer-stage::before,
+  .timer-stage::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(6px);
+    opacity: 0.7;
+  }
+
+  .timer-stage::before {
+    width: 240px;
+    height: 240px;
+    top: -80px;
+    right: -60px;
+    background: radial-gradient(circle, rgba(255, 111, 145, 0.22), transparent 68%);
+  }
+
+  .timer-stage::after {
+    width: 220px;
+    height: 220px;
+    left: -80px;
+    bottom: -90px;
+    background: radial-gradient(circle, rgba(72, 203, 183, 0.18), transparent 70%);
+  }
+
+  .stage-badge {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.72);
+    border: 1px solid rgba(255,255,255,0.86);
+    color: #9e6f86;
+    font: 700 11px 'JetBrains Mono', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .motivation-card {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 360px);
+    margin-top: 10px;
+    padding: 12px 16px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.82), rgba(255,240,247,0.92));
+    border: 1px solid rgba(255,255,255,0.82);
+    text-align: center;
+  }
+
+  .motivation-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 0.08em;
+    color: #d85b87;
+  }
+
+  .motivation-copy {
+    margin-top: 4px;
+    color: var(--text-dim);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .phase-label {
+    position: relative;
+    z-index: 1;
+    margin: 18px 0 10px;
+    min-height: 28px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.24em;
+    color: rgba(62, 43, 56, 0.72);
+    transition: color 0.3s ease;
+  }
+
   .phase-label.work { color: var(--work-color); }
   .phase-label.rest { color: var(--rest-color); }
-  .phase-label.ready { color: #FFD600; }
+  .phase-label.ready { color: var(--ready-color); }
 
-  /* BIG TIMER */
   .timer-ring-wrap {
     position: relative;
-    width: 280px;
-    height: 280px;
-    margin: 8px 0;
+    z-index: 1;
+    width: min(100%, 360px);
+    aspect-ratio: 1;
+    margin: 2px 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .timer-ring-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 22px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(255,241,247,0.72));
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.8);
   }
 
   .timer-ring-svg {
-    width: 280px;
-    height: 280px;
+    width: 100%;
+    height: 100%;
     transform: rotate(-90deg);
   }
 
   .ring-bg {
     fill: none;
-    stroke: rgba(255,255,255,0.05);
-    stroke-width: 8;
+    stroke: rgba(216, 182, 198, 0.34);
+    stroke-width: 10;
   }
 
   .ring-progress {
     fill: none;
-    stroke-width: 8;
+    stroke-width: 10;
     stroke-linecap: round;
     stroke-dasharray: 754;
     stroke-dashoffset: 0;
-    transition: stroke-dashoffset 0.1s linear, stroke 0.4s;
+    transition: stroke-dashoffset 0.1s linear, stroke 0.3s ease, filter 0.3s ease;
   }
 
-  .ring-progress.work { stroke: var(--work-color); filter: drop-shadow(0 0 8px var(--work-color)); }
-  .ring-progress.rest { stroke: var(--rest-color); filter: drop-shadow(0 0 8px var(--rest-color)); }
-  .ring-progress.ready { stroke: #FFD600; filter: drop-shadow(0 0 8px #FFD600); }
+  .ring-progress.work { stroke: var(--work-color); filter: drop-shadow(0 0 10px rgba(255, 111, 145, 0.48)); }
+  .ring-progress.rest { stroke: var(--rest-color); filter: drop-shadow(0 0 10px rgba(72, 203, 183, 0.42)); }
+  .ring-progress.ready { stroke: var(--ready-color); filter: drop-shadow(0 0 10px rgba(255, 191, 105, 0.42)); }
 
   .timer-display {
     position: absolute;
@@ -157,731 +387,1528 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    text-align: center;
   }
 
   .time-num {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 88px;
-    line-height: 1;
-    letter-spacing: 0.02em;
-    color: var(--text);
-    transition: color 0.4s;
+    font-size: clamp(96px, 17vw, 128px);
+    line-height: 0.9;
+    letter-spacing: 0.03em;
+    color: #5a3750;
+    text-shadow: 0 8px 18px rgba(122, 83, 106, 0.12);
+    transition: color 0.3s ease, transform 0.2s ease;
   }
+
   .time-num.work { color: var(--work-color); }
   .time-num.rest { color: var(--rest-color); }
-  .time-num.ready { color: #FFD600; }
+  .time-num.ready { color: var(--ready-color); }
 
   .round-info {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: var(--text-dim);
-    margin-top: 4px;
+    margin-top: 10px;
+    font: 700 13px 'JetBrains Mono', monospace;
+    letter-spacing: 0.08em;
+    color: rgba(113, 83, 103, 0.92);
   }
 
-  /* Voice cue marquee */
   .voice-cue-bar {
-    width: 100%;
-    max-width: 320px;
-    margin: 16px 0 4px;
-    padding: 10px 16px;
-    background: var(--surface2);
-    border-radius: 8px;
-    border-left: 3px solid var(--text-dim);
-    transition: border-color 0.4s;
-    min-height: 44px;
+    position: relative;
+    z-index: 1;
+    width: min(100%, 430px);
+    min-height: 60px;
+    margin-top: 12px;
+    padding: 14px 18px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.74);
+    border: 1px solid rgba(255,255,255,0.86);
     display: flex;
     align-items: center;
+    backdrop-filter: blur(12px);
+    transition: border-color 0.3s ease, background 0.3s ease;
   }
-  .voice-cue-bar.work { border-color: var(--work-color); }
-  .voice-cue-bar.rest { border-color: var(--rest-color); }
+
+  .voice-cue-bar.work { border-color: rgba(255, 111, 145, 0.42); }
+  .voice-cue-bar.rest { border-color: rgba(72, 203, 183, 0.46); }
 
   .voice-cue-text {
-    font-size: 13px;
-    color: var(--text-dim);
-    font-weight: 300;
-    line-height: 1.4;
-    white-space: nowrap;
+    font-size: 14px;
+    color: #8f7083;
+    line-height: 1.45;
+    white-space: normal;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: color 0.4s;
+    text-align: center;
+    width: 100%;
   }
-  .voice-cue-text.active { color: var(--text); font-weight: 500; }
 
-  /* Controls */
+  .voice-cue-text.active { color: #4d3444; font-weight: 700; }
+
   .controls {
+    position: relative;
+    z-index: 1;
     display: flex;
-    gap: 12px;
-    margin-top: 20px;
     align-items: center;
+    gap: 14px;
+    margin-top: 16px;
+  }
+
+  .btn-main,
+  .btn-sec,
+  .save-btn,
+  .test-btn,
+  .complete-btn {
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease, background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
   }
 
   .btn-main {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
+    width: 92px;
+    height: 92px;
     border: none;
-    background: var(--work-color);
-    color: #fff;
-    font-size: 28px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.15s, opacity 0.15s;
-    box-shadow: 0 0 20px rgba(255,61,0,0.4);
+    border-radius: 28px;
+    background: linear-gradient(135deg, #ff7ea5, #ff9cba);
+    color: #fff8ff;
+    font-size: 34px;
+    box-shadow: 0 20px 36px rgba(255, 126, 165, 0.34);
   }
-  .btn-main:active { transform: scale(0.94); }
-  .btn-main:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .btn-main:active,
+  .btn-sec:active,
+  .save-btn:active,
+  .test-btn:active,
+  .complete-btn:active { transform: translateY(1px) scale(0.98); }
+
+  .btn-main:disabled { opacity: 0.35; cursor: not-allowed; }
 
   .btn-sec {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.12);
-    background: var(--surface2);
-    color: var(--text-dim);
-    font-size: 18px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s;
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.86);
+    background: rgba(255,255,255,0.88);
+    color: #8f6a7d;
+    font-size: 21px;
+    backdrop-filter: blur(10px);
   }
-  .btn-sec:hover { color: var(--text); border-color: rgba(255,255,255,0.25); }
-  .btn-sec:active { transform: scale(0.93); }
 
-  /* Round progress dots */
+  .btn-sec:hover,
+  .btn-main:hover,
+  .save-btn:hover,
+  .test-btn:hover,
+  .complete-btn:hover { transform: translateY(-1px); }
+
   .round-dots {
+    position: relative;
+    z-index: 1;
     display: flex;
-    gap: 6px;
-    margin-top: 20px;
     flex-wrap: wrap;
     justify-content: center;
-    max-width: 320px;
+    gap: 8px;
+    width: min(100%, 420px);
+    margin-top: 16px;
   }
+
   .dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--surface2);
-    border: 1px solid rgba(255,255,255,0.1);
-    transition: background 0.3s;
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.78);
+    border: 1px solid rgba(216, 182, 198, 0.4);
+    transition: all 0.2s ease;
   }
+
   .dot.done { background: var(--work-color); border-color: var(--work-color); }
-  .dot.current { background: #FFD600; border-color: #FFD600; box-shadow: 0 0 6px #FFD600; }
+  .dot.current { background: var(--ready-color); border-color: var(--ready-color); box-shadow: 0 0 16px rgba(242, 185, 15, 0.65); transform: scale(1.18); }
 
-  /* Status text */
   .status-line {
-    font-size: 12px;
-    color: var(--text-dim);
+    position: relative;
+    z-index: 1;
     margin-top: 12px;
-    font-family: 'JetBrains Mono', monospace;
-    letter-spacing: 0.05em;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.76);
+    border: 1px solid rgba(255,255,255,0.88);
+    color: #75586a;
+    font: 700 11px 'JetBrains Mono', monospace;
+    letter-spacing: 0.08em;
+    text-align: center;
   }
 
-  /* ===== SETTINGS TAB ===== */
-  .settings-section {
-    flex: 1;
-    padding: 24px 20px;
+  .pace-shell {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    overflow-y: auto;
-    overflow-x: hidden;
+    gap: 18px;
+  }
+
+  .pace-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 6px;
+    border-radius: 24px;
+    background: rgba(255,255,255,0.68);
+    border: 1px solid rgba(255,255,255,0.78);
+    box-shadow: var(--shadow);
+  }
+
+  .pace-tab-btn {
+    border: none;
+    border-radius: 18px;
+    padding: 12px 10px;
+    background: transparent;
+    color: var(--text-dim);
+    font: 700 13px 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+
+  .pace-tab-btn.active {
+    background: linear-gradient(135deg, #48cbb7, #7be3d4);
+    color: #173431;
+    box-shadow: 0 10px 24px rgba(72, 203, 183, 0.24);
+  }
+
+  .pace-panel { display: none; }
+  .pace-panel.active { display: block; }
+
+  .pace-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .pace-card {
+    padding: 20px;
+    border-radius: var(--radius-lg);
+    background: rgba(255,255,255,0.78);
+    border: 1px solid rgba(255,255,255,0.82);
+    box-shadow: var(--shadow);
+  }
+
+  .pace-card-title {
+    font: 700 14px 'Noto Sans KR', sans-serif;
+    color: #385653;
+    margin-bottom: 12px;
+  }
+
+  .pace-card-kicker {
+    font: 700 11px 'JetBrains Mono', monospace;
+    letter-spacing: 0.12em;
+    color: #83a19c;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .pace-unit-grid,
+  .pace-stat-grid,
+  .pace-training-list,
+  .pace-prediction-list,
+  .pace-interval-list,
+  .pace-goal-stats {
+    display: grid;
+    gap: 10px;
+  }
+
+  .pace-unit-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pace-stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .pace-goal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+
+  .pace-unit-btn,
+  .pace-chip {
+    transition: all 0.18s ease;
+    cursor: pointer;
+  }
+
+  .pace-unit-btn {
+    display: block;
     width: 100%;
-    box-sizing: border-box;
+    border: 1px solid rgba(72, 203, 183, 0.12);
+    border-radius: 18px;
+    padding: 12px 12px 14px;
+    background: rgba(255,255,255,0.72);
+    text-align: left;
+  }
+
+  .pace-unit-btn.active {
+    background: linear-gradient(135deg, #48cbb7, #7be3d4);
+    color: #183633;
+    box-shadow: 0 12px 24px rgba(72, 203, 183, 0.22);
+  }
+
+  .pace-unit-name { font-size: 13px; font-weight: 700; }
+  .pace-unit-preview {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 7px;
+    color: #223f3c;
+  }
+
+  .pace-unit-preview-value {
+    font: 800 25px 'JetBrains Mono', monospace;
+    line-height: 0.96;
+    letter-spacing: -0.04em;
+  }
+
+  .pace-unit-preview-unit {
+    color: rgba(34, 63, 60, 0.48);
+    font: 700 12px 'Noto Sans KR', sans-serif;
+    letter-spacing: 0;
+  }
+
+  .pace-input-wrap {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    padding: 16px 18px;
+    border-radius: 24px;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(255,255,255,0.88);
+  }
+
+  .pace-text-input,
+  .pace-select {
+    width: 100%;
+    background: rgba(255,255,255,0.86);
+    border: 1px solid rgba(72, 203, 183, 0.12);
+    border-radius: 16px;
+    padding: 14px 16px;
+    color: #35504c;
+    outline: none;
+    font: 700 16px 'JetBrains Mono', monospace;
+  }
+
+  .pace-big-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    outline: none;
+    color: #23403d;
+    font: 900 clamp(38px, 8vw, 54px) 'Bebas Neue', sans-serif;
+    letter-spacing: 0.03em;
+  }
+
+  .pace-unit-suffix {
+    color: #6c908a;
+    font: 700 18px 'JetBrains Mono', monospace;
+    padding-bottom: 8px;
+    white-space: nowrap;
+  }
+
+  .pace-chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+  .pace-chip {
+    border: none;
+    border-radius: 999px;
+    padding: 8px 12px;
+    background: rgba(72, 203, 183, 0.1);
+    color: #426662;
+    font: 700 12px 'Noto Sans KR', sans-serif;
+  }
+
+  .pace-stat-card {
+    padding: 12px 14px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.72);
+    border: 1px solid rgba(255,255,255,0.82);
+  }
+
+  .pace-stat-label { font-size: 12px; color: #7b9491; }
+  .pace-row-label,
+  .pace-training-desc {
+    font-size: 14px;
+    color: #7b9491;
+  }
+
+  .pace-stat-value,
+  .pace-row-value,
+  .pace-goal-highlight {
+    margin-top: 1px;
+    color: #264542;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.04em;
+  }
+
+  .pace-stat-value { font-size: 28px; }
+  .pace-row-value { font-size: 22px; }
+  .pace-goal-highlight { font-size: 54px; line-height: 0.92; }
+
+  .pace-row-subvalue {
+    color: #6f8d89;
+    font: 800 14px 'JetBrains Mono', monospace;
+    letter-spacing: 0.02em;
+  }
+
+  .pace-row-meta {
+    margin-top: 0;
+    color: #98aba8;
+    font-size: 10px;
+    line-height: 1.1;
+  }
+
+  .pace-list-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(72, 203, 183, 0.08);
+  }
+
+  .pace-list-row:last-child {
+    border-bottom: none;
+  }
+
+  .pace-scenario-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .pace-scenario-btn {
+    border: 1px solid rgba(72, 203, 183, 0.14);
+    border-radius: 999px;
+    padding: 8px 12px;
+    background: rgba(72, 203, 183, 0.06);
+    color: #55716d;
+    font: 700 12px 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+
+  .pace-scenario-btn.active {
+    background: linear-gradient(135deg, #48cbb7, #7be3d4);
+    color: #173431;
+    box-shadow: 0 8px 18px rgba(72, 203, 183, 0.18);
+  }
+
+  .pace-prediction-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0;
+  }
+
+  .pace-highlight-card {
+    padding: 20px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, rgba(72,203,183,0.14), rgba(255,255,255,0.9));
+    border: 1px solid rgba(255,255,255,0.82);
+  }
+
+  .pace-empty { color: #8da3a0; font-size: 13px; line-height: 1.6; }
+
+  .settings-section {
+    display: grid;
+    grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+
+  .settings-aside {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    position: sticky;
+    top: 100px;
+  }
+
+  .settings-card {
+    padding: 24px;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.58);
+    backdrop-filter: blur(16px);
   }
 
   .section-title {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 16px;
-    letter-spacing: 0.2em;
+    font-size: 22px;
+    letter-spacing: 0.18em;
+    color: #2b1a10;
+  }
+
+  .section-copy {
+    margin-top: 10px;
     color: var(--text-dim);
-    padding-bottom: 8px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .save-btn {
+    width: 100%;
+    margin-top: 18px;
+    padding: 16px 18px;
+    border: none;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #ff7ea5 0%, #ff96b5 100%);
+    color: #fff8ff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.12em;
+    box-shadow: 0 18px 36px rgba(255, 126, 165, 0.24);
+  }
+
+  .settings-main {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
   }
 
   .setting-group {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
+    margin-top: 18px;
   }
 
   .setting-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 14px;
     min-width: 0;
+    padding: 16px 0;
+    border-top: 1px solid var(--line);
   }
 
+  .setting-row:first-child { border-top: none; padding-top: 0; }
+
   .setting-label {
-    font-size: 14px;
-    font-weight: 400;
+    font-size: 15px;
+    font-weight: 600;
     color: var(--text);
     flex-shrink: 0;
-    min-width: 80px;
+    min-width: 84px;
   }
+
   .setting-sub {
-    font-size: 11px;
+    margin-top: 4px;
+    font-size: 12px;
     color: var(--text-dim);
-    margin-top: 2px;
+    line-height: 1.5;
   }
 
   .num-control {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0;
-    background: var(--surface2);
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.08);
+    gap: 2px;
+    padding: 4px;
+    border-radius: 16px;
+    background: rgba(34, 22, 15, 0.05);
+    border: 1px solid rgba(78, 49, 29, 0.08);
     flex-shrink: 0;
   }
+
   .num-btn {
-    width: 44px; height: 44px;
+    width: 40px;
+    height: 40px;
     border: none;
-    background: none;
+    border-radius: 12px;
+    background: transparent;
     color: var(--text-dim);
     font-size: 20px;
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .num-btn:hover { background: rgba(255,255,255,0.06); color: var(--text); }
-  .num-val {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--text);
-    min-width: 44px;
-    text-align: center;
   }
 
-  /* Voice settings */
+  .num-btn:hover { background: rgba(34, 22, 15, 0.06); color: var(--text); }
+
+  .num-val {
+    min-width: 52px;
+    text-align: center;
+    font: 700 16px 'JetBrains Mono', monospace;
+    color: var(--text);
+  }
+
   .voice-block {
-    background: var(--surface2);
-    border-radius: 12px;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    border: 1px solid rgba(255,255,255,0.06);
+    padding: 18px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.58);
+    border: 1px solid rgba(255,255,255,0.62);
   }
 
   .voice-row-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
   }
 
   .voice-type-label {
-    font-size: 13px;
-    font-weight: 500;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
   }
-  .dot-work { width: 8px; height: 8px; border-radius: 50%; background: var(--work-color); flex-shrink: 0; }
-  .dot-rest { width: 8px; height: 8px; border-radius: 50%; background: var(--rest-color); flex-shrink: 0; }
 
-  .voice-textarea {
+  .dot-work,
+  .dot-rest {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-work { background: var(--work-color); }
+  .dot-rest { background: var(--rest-color); }
+
+  .voice-textarea,
+  .voice-select,
+  input[type=range] {
     width: 100%;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 8px;
-    padding: 10px 12px;
+  }
+
+  .voice-textarea,
+  .voice-select {
+    background: rgba(255,255,255,0.74);
+    border: 1px solid rgba(78, 49, 29, 0.1);
+    border-radius: 16px;
+    padding: 12px 14px;
     color: var(--text);
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 13px;
-    resize: vertical;
-    min-height: 60px;
     outline: none;
-    transition: border-color 0.2s;
-    line-height: 1.5;
   }
-  .voice-textarea:focus { border-color: rgba(255,255,255,0.2); }
-  .voice-textarea::placeholder { color: var(--text-dim); }
+
+  .voice-textarea {
+    resize: vertical;
+    min-height: 64px;
+    line-height: 1.55;
+  }
+
+  .voice-textarea:focus,
+  .voice-select:focus { border-color: rgba(240, 90, 40, 0.35); }
+
+  .voice-textarea::placeholder { color: #a48d7a; }
 
   .voice-hint {
+    margin-top: 8px;
     font-size: 11px;
     color: var(--text-dim);
-    line-height: 1.5;
+    line-height: 1.6;
   }
 
   .test-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    border-radius: 6px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
+    padding: 9px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(78, 49, 29, 0.1);
+    background: rgba(34, 22, 15, 0.04);
     color: var(--text-dim);
     font-size: 12px;
     font-family: 'Noto Sans KR', sans-serif;
-    cursor: pointer;
-    transition: all 0.15s;
   }
-  .test-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
 
-  /* Toggle switch */
-  .toggle-wrap { display: flex; align-items: center; gap: 8px; }
+  .test-btn:hover {
+    color: var(--text);
+    background: rgba(34, 22, 15, 0.08);
+  }
+
   .toggle {
     position: relative;
-    width: 40px; height: 22px;
+    width: 48px;
+    height: 28px;
   }
+
   .toggle input { opacity: 0; width: 0; height: 0; }
+
   .toggle-slider {
     position: absolute;
     inset: 0;
-    background: rgba(255,255,255,0.12);
-    border-radius: 11px;
+    border-radius: 999px;
+    background: rgba(34, 22, 15, 0.14);
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.2s ease;
   }
+
   .toggle-slider::before {
     content: '';
     position: absolute;
-    width: 16px; height: 16px;
-    left: 3px; top: 3px;
+    top: 4px;
+    left: 4px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     background: #fff;
-    transition: transform 0.2s;
+    box-shadow: 0 2px 6px rgba(34, 22, 15, 0.18);
+    transition: transform 0.2s ease;
   }
-  .toggle input:checked + .toggle-slider { background: var(--work-color); }
-  .toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
 
-  /* Voice & speed controls */
-  .voice-select {
-    background: var(--surface2);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px;
-    padding: 8px 12px;
-    color: var(--text);
-    font-family: 'Noto Sans KR', sans-serif;
-    font-size: 13px;
-    outline: none;
-    cursor: pointer;
-    width: 100%;
+  .toggle input:checked + .toggle-slider {
+    background: linear-gradient(135deg, var(--work-color), #ff8d4d);
   }
-  .voice-select option { background: #1C1C28; }
 
-  .range-wrap { display: flex; align-items: center; gap: 10px; }
+  .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+  .range-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
   input[type=range] {
-    flex: 1;
     -webkit-appearance: none;
-    height: 4px;
-    border-radius: 2px;
-    background: rgba(255,255,255,0.1);
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(240, 90, 40, 0.18), rgba(27, 182, 165, 0.22));
     outline: none;
-    cursor: pointer;
   }
+
   input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 16px; height: 16px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    background: var(--work-color);
+    background: #ff7ea5;
+    border: 2px solid #fff8ff;
+    box-shadow: 0 3px 10px rgba(255, 126, 165, 0.24);
     cursor: pointer;
   }
+
   .range-val {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: var(--text-dim);
-    min-width: 30px;
+    min-width: 32px;
     text-align: right;
+    font: 700 12px 'JetBrains Mono', monospace;
+    color: var(--text-dim);
   }
 
-  /* Save button */
-  .save-btn {
-    width: 100%;
-    padding: 14px;
-    border-radius: 10px;
-    border: none;
-    background: var(--work-color);
-    color: #fff;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 18px;
-    letter-spacing: 0.15em;
-    cursor: pointer;
-    transition: opacity 0.15s, transform 0.15s;
-    margin-top: 4px;
-  }
-  .save-btn:active { transform: scale(0.98); opacity: 0.9; }
-
-  /* Countdown overlay */
   .countdown-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(10,10,15,0.95);
+    z-index: 500;
     display: none;
     align-items: center;
     justify-content: center;
-    z-index: 500;
     flex-direction: column;
-    gap: 16px;
-  }
-  .countdown-overlay.show { display: flex; }
-  .countdown-num {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 160px;
-    color: #FFD600;
-    line-height: 1;
-    animation: pulse 1s ease-in-out infinite;
-    filter: drop-shadow(0 0 30px #FFD600);
-  }
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.08); }
-  }
-  .countdown-label {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
-    letter-spacing: 0.3em;
-    color: var(--text-dim);
+    gap: 20px;
+    background: rgba(79, 49, 67, 0.84);
+    backdrop-filter: blur(12px);
   }
 
-  /* Flash effect */
+  .countdown-overlay.show { display: flex; }
+
+  .countdown-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.28em;
+    color: rgba(255,248,252,0.8);
+  }
+
+  .countdown-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(140px, 30vw, 220px);
+    line-height: 0.9;
+    color: var(--ready-color);
+    text-shadow: 0 0 32px rgba(242, 185, 15, 0.3);
+    animation: pulse 1s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+  }
+
   .flash-overlay {
     position: fixed;
     inset: 0;
-    pointer-events: none;
     z-index: 200;
+    pointer-events: none;
     opacity: 0;
-    transition: opacity 0.1s;
+    transition: opacity 0.1s ease;
   }
-  .flash-overlay.flash-work { background: rgba(255,61,0,0.15); }
-  .flash-overlay.flash-rest { background: rgba(0,229,255,0.12); }
 
-  /* Completion screen */
+  .flash-overlay.flash-work { background: rgba(240, 90, 40, 0.1); }
+  .flash-overlay.flash-rest { background: rgba(27, 182, 165, 0.1); }
+
   .complete-overlay {
     position: fixed;
     inset: 0;
-    background: var(--bg);
+    z-index: 600;
     display: none;
     align-items: center;
     justify-content: center;
-    z-index: 600;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
     text-align: center;
-    padding: 40px;
+    padding: 28px;
+    background: rgba(79, 49, 67, 0.82);
+    backdrop-filter: blur(12px);
   }
+
   .complete-overlay.show { display: flex; }
+
   .complete-title {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 64px;
-    letter-spacing: 0.1em;
-    background: linear-gradient(135deg, var(--work-color), #FFD600);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: clamp(64px, 12vw, 96px);
+    line-height: 0.92;
+    letter-spacing: 0.12em;
+    color: #fff8f2;
   }
+
   .complete-stats {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    color: var(--text-dim);
-    line-height: 2;
+    max-width: 420px;
+    padding: 22px;
+    border-radius: 22px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(255,248,242,0.82);
+    font: 400 14px 'JetBrains Mono', monospace;
+    line-height: 1.85;
+    white-space: pre-line;
   }
+
   .complete-btn {
-    margin-top: 20px;
-    padding: 12px 40px;
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.15);
-    background: none;
-    color: var(--text);
+    margin-top: 10px;
+    padding: 14px 26px;
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 16px;
+    background: rgba(255,255,255,0.08);
+    color: #fff8f2;
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 18px;
-    letter-spacing: 0.15em;
-    cursor: pointer;
-    transition: all 0.2s;
+    font-size: 22px;
+    letter-spacing: 0.12em;
   }
-  .complete-btn:hover { background: rgba(255,255,255,0.06); }
 
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 4px; }
+  #ttsStatus {
+    padding: 14px 16px !important;
+    border-radius: 18px !important;
+    background: rgba(34, 22, 15, 0.04) !important;
+    border: 1px solid rgba(78, 49, 29, 0.08) !important;
+    color: var(--text-dim) !important;
+    line-height: 1.7 !important;
+  }
+
+  code {
+    padding: 2px 6px;
+    border-radius: 8px;
+    background: rgba(34, 22, 15, 0.06);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95em;
+  }
+
+  ::-webkit-scrollbar { width: 8px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb { background: rgba(78, 49, 29, 0.18); border-radius: 999px; }
 
-  @keyframes slidein { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+  @keyframes panel-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @media (max-width: 980px) {
+    .timer-section,
+    .settings-section {
+      grid-template-columns: 1fr;
+    }
+
+    .settings-aside {
+      position: static;
+    }
+
+    .hero-panel,
+    .timer-stage,
+    .settings-card { padding: 22px; }
+
+    .timer-stage { min-height: 0; }
+  }
+
+  @media (max-width: 640px) {
+    .app-wrapper {
+      min-height: 100dvh;
+      padding: calc(10px + env(safe-area-inset-top, 0px)) 12px calc(16px + env(safe-area-inset-bottom, 0px));
+      gap: 10px;
+    }
+
+    .tab-nav {
+      width: 100%;
+      align-self: stretch;
+      justify-content: stretch;
+      top: 0;
+      padding: 6px;
+    }
+
+    .tab-btn {
+      min-width: 0;
+      flex: 1;
+      padding: 11px 8px;
+      font-size: 12px;
+    }
+
+    .pace-goal-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .pace-tabs {
+      gap: 6px;
+      padding: 5px;
+      border-radius: 22px;
+    }
+
+    .pace-tab-btn {
+      padding: 11px 8px;
+      font-size: 12px;
+      border-radius: 16px;
+    }
+
+    .pace-scenario-tabs {
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .pace-scenario-btn {
+      padding: 7px 10px;
+      font-size: 11px;
+    }
+
+    .pace-unit-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .pace-stat-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .pace-card {
+      padding: 14px;
+      border-radius: 20px;
+    }
+
+    .pace-stat-card {
+      padding: 10px 12px;
+    }
+
+    .pace-list-row {
+      gap: 8px;
+      padding: 3px 0;
+    }
+
+    .pace-card-title {
+      margin-bottom: 10px;
+    }
+
+    .pace-unit-btn {
+      padding: 12px;
+      border-radius: 16px;
+    }
+
+    .pace-unit-name {
+      font-size: 12px;
+    }
+
+    .pace-unit-preview {
+      gap: 6px;
+      margin-top: 5px;
+    }
+
+    .pace-unit-preview-value {
+      font-size: 21px;
+    }
+
+    .pace-unit-preview-unit {
+      font-size: 11px;
+    }
+
+    .pace-big-input { font-size: 42px; }
+
+    .pace-input-wrap { padding: 14px 14px; }
+
+    .pace-unit-suffix {
+      flex: 0 0 auto;
+      font-size: 16px;
+      padding-bottom: 6px;
+      white-space: nowrap;
+    }
+
+    .pace-prediction-stack {
+      align-items: flex-end;
+    }
+
+    .pace-chip-row {
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .pace-chip {
+      padding: 7px 11px;
+      font-size: 11px;
+    }
+
+    .pace-stat-card {
+      padding: 14px 12px;
+      border-radius: 16px;
+    }
+
+    .pace-stat-value {
+      font-size: 22px;
+    }
+
+    .pace-list-row { padding: 14px; }
+
+    #tab-timer.active {
+      height: calc(100dvh - 72px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    }
+
+    .timer-section {
+      height: 100%;
+    }
+
+    .hero-panel {
+      display: none;
+    }
+
+    .motivation-card {
+      width: 100%;
+      margin-top: 6px;
+      padding: 10px 12px;
+      border-radius: 18px;
+    }
+
+    .motivation-title {
+      font-size: 20px;
+    }
+
+    .motivation-copy {
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .timer-stage {
+      min-height: 100%;
+      border-radius: 28px;
+      padding: 12px 14px 14px;
+      justify-content: space-between;
+    }
+
+    .stage-badge {
+      padding: 7px 12px;
+      font-size: 10px;
+    }
+
+    .phase-label {
+      margin: 6px 0 6px;
+      font-size: 24px;
+      letter-spacing: 0.18em;
+      min-height: 22px;
+    }
+
+    .timer-ring-wrap {
+      width: min(100%, 292px);
+      margin: 0;
+    }
+
+    .timer-ring-wrap::before {
+      inset: 18px;
+    }
+
+    .time-num {
+      font-size: 98px;
+    }
+
+    .round-info {
+      margin-top: 6px;
+      font-size: 11px;
+    }
+
+    .voice-cue-bar {
+      min-height: 52px;
+      margin-top: 6px;
+      padding: 10px 12px;
+      border-radius: 16px;
+    }
+
+    .voice-cue-text {
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .controls {
+      width: 100%;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .btn-main {
+      width: 76px;
+      height: 76px;
+      border-radius: 24px;
+      font-size: 28px;
+    }
+
+    .btn-sec {
+      width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      font-size: 18px;
+    }
+
+    .round-dots {
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+    }
+
+    .status-line {
+      margin-top: 8px;
+      padding: 9px 12px;
+      font-size: 10px;
+      letter-spacing: 0.05em;
+    }
+
+    .setting-row,
+    .voice-row-header {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .num-control,
+    .range-wrap {
+      width: 100%;
+    }
+
+    .num-control { justify-content: space-between; }
+  }
 </style>
 </head>
 <body>
 
 <div class="app-wrapper">
-  <!-- TAB NAV -->
   <nav class="tab-nav">
-    <button class="tab-btn active" onclick="showTab('timer', this)">⏱ 타이머</button>
-    <button class="tab-btn" onclick="showTab('settings', this)">⚙ 설정</button>
+    <button class="tab-btn active" data-tab="timer" onclick="showTab('timer', this)">⏱ 타이머</button>
+    <button class="tab-btn" data-tab="pace" onclick="showTab('pace', this)">🏃 페이스</button>
+    <button class="tab-btn" data-tab="settings" onclick="showTab('settings', this)">⚙ 설정</button>
   </nav>
 
-  <!-- ===== TIMER PANEL ===== -->
   <div class="tab-panel active" id="tab-timer">
     <div class="timer-section">
-      <div class="phase-label" id="phaseLabel">준비 완료</div>
-
-      <div class="timer-ring-wrap">
-        <svg class="timer-ring-svg" viewBox="0 0 280 280">
-          <circle class="ring-bg" cx="140" cy="140" r="120"/>
-          <circle class="ring-progress ready" id="ringProgress" cx="140" cy="140" r="120"/>
-        </svg>
-        <div class="timer-display">
-          <div class="time-num" id="timeNum">20</div>
-          <div class="round-info" id="roundInfo">라운드 — / —</div>
+      <aside class="hero-panel">
+        <div>
+          <div class="hero-kicker">TABATA VOICE COACH</div>
+          <div class="hero-title">TRAIN<br>ON BEAT</div>
+          <p class="hero-lead">
+            짧게 움직이고, 가볍게 숨 고르고, 오늘의 리듬을 스스로 만들어가는 루틴 타이머입니다.
+          </p>
         </div>
-      </div>
 
-      <div class="voice-cue-bar" id="voiceCueBar">
-        <span class="voice-cue-text" id="voiceCueText">음성 안내가 여기 표시됩니다</span>
-      </div>
+        <div class="hero-metrics">
+          <div class="hero-stat">
+            <div class="hero-stat-label">Flow</div>
+            <div class="hero-stat-value">Work</div>
+            <div class="hero-stat-copy">운동, 휴식, 준비 흐름 자동 전환</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-label">Voice</div>
+            <div class="hero-stat-value">TTS</div>
+            <div class="hero-stat-copy">카운트와 안내 문장을 직접 커스터마이즈</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-label">Pace</div>
+            <div class="hero-stat-value">Tempo</div>
+            <div class="hero-stat-copy">횟수 카운트와 남은 시간 리듬 관리</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-label">Preset</div>
+            <div class="hero-stat-value">Mobile</div>
+            <div class="hero-stat-copy">단일 파일 구조로 빠르게 수정 가능</div>
+          </div>
+        </div>
+      </aside>
 
-      <div class="controls">
-        <button class="btn-sec" id="resetBtn" onclick="resetTimer()" title="리셋">↺</button>
-        <button class="btn-main" id="startBtn" onclick="toggleTimer()">▶</button>
-        <button class="btn-sec" id="skipBtn" onclick="skipPhase()" title="다음 단계">⏭</button>
-      </div>
+      <section class="timer-stage">
+        <div class="stage-badge">LIVE SESSION</div>
+        <div class="motivation-card">
+          <div class="motivation-title" id="motivationTitle">오늘도 해낸 나, 꽤 멋진데?</div>
+          <div class="motivation-copy" id="motivationCopy">지금 필요한 건 완벽함보다 시작이에요. 오늘의 20초가 분명히 쌓입니다.</div>
+        </div>
+        <div class="phase-label" id="phaseLabel">시작할 준비 됐어요</div>
 
-      <div class="round-dots" id="roundDots"></div>
-      <div class="status-line" id="statusLine">시작 버튼을 눌러 타바타를 시작하세요</div>
+        <div class="timer-ring-wrap">
+          <svg class="timer-ring-svg" viewBox="0 0 280 280">
+            <circle class="ring-bg" cx="140" cy="140" r="120"/>
+            <circle class="ring-progress ready" id="ringProgress" cx="140" cy="140" r="120"/>
+          </svg>
+          <div class="timer-display">
+            <div class="time-num" id="timeNum">20</div>
+            <div class="round-info" id="roundInfo">라운드 — / —</div>
+          </div>
+        </div>
+
+        <div class="voice-cue-bar" id="voiceCueBar">
+          <span class="voice-cue-text" id="voiceCueText">좋아요. 한 번에 완벽할 필요 없이 오늘 한 세트면 충분해요</span>
+        </div>
+
+        <div class="controls">
+          <button class="btn-sec" id="resetBtn" onclick="resetTimer()" title="리셋">↺</button>
+          <button class="btn-main" id="startBtn" onclick="toggleTimer()">▶</button>
+          <button class="btn-sec" id="skipBtn" onclick="skipPhase()" title="다음 단계">⏭</button>
+        </div>
+
+        <div class="round-dots" id="roundDots"></div>
+        <div class="status-line" id="statusLine">오늘도 내 리듬으로, 시작 버튼만 누르면 돼요</div>
+      </section>
     </div>
   </div>
 
-  <!-- ===== SETTINGS PANEL ===== -->
+  <div class="tab-panel" id="tab-pace">
+    <div class="pace-shell">
+      <div class="pace-tabs">
+        <button class="pace-tab-btn active" data-pace-tab="convert" onclick="showPaceTab('convert', this)">변환</button>
+        <button class="pace-tab-btn" data-pace-tab="goal" onclick="showPaceTab('goal', this)">목표</button>
+        <button class="pace-tab-btn" data-pace-tab="interval" onclick="showPaceTab('interval', this)">인터벌</button>
+      </div>
+
+      <div class="pace-panel active" id="pace-panel-convert">
+        <div class="pace-grid">
+          <div class="pace-card">
+            <div class="pace-card-kicker">Input Unit</div>
+            <div class="pace-card-title">입력 단위를 선택하세요</div>
+            <div class="pace-unit-grid" id="paceUnitGrid"></div>
+            <div class="pace-input-wrap" style="margin-top:14px;">
+              <input class="pace-big-input" id="paceInputValue" inputmode="numeric" value="4:30">
+              <div class="pace-unit-suffix" id="paceInputUnitLabel">/km</div>
+            </div>
+            <div class="pace-card-kicker" style="margin-top:14px; margin-bottom:0;">자주 쓰는 값</div>
+            <div class="pace-chip-row" id="pacePresetRow"></div>
+          </div>
+
+          <div class="pace-stat-grid">
+            <div class="pace-stat-card">
+              <div class="pace-stat-label">km 페이스</div>
+              <div class="pace-stat-value" id="paceStatPace">4'30"</div>
+            </div>
+            <div class="pace-stat-card">
+              <div class="pace-stat-label">시속</div>
+              <div class="pace-stat-value" id="paceStatSpeed">13.3</div>
+            </div>
+            <div class="pace-stat-card">
+              <div class="pace-stat-label">100m</div>
+              <div class="pace-stat-value" id="paceStat100m">27.0초</div>
+            </div>
+          </div>
+
+          <div class="pace-card">
+            <div class="pace-card-title">거리별 예상 기록</div>
+            <div class="pace-scenario-tabs" id="paceScenarioTabs"></div>
+            <div class="pace-prediction-list" id="pacePredictionList"></div>
+          </div>
+
+          <div class="pace-card">
+            <div class="pace-card-title">추천 훈련 페이스</div>
+            <div class="pace-training-list" id="paceTrainingList"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pace-panel" id="pace-panel-goal">
+        <div class="pace-grid">
+          <div class="pace-card">
+            <div class="pace-card-title">목표 완주 기록</div>
+            <div class="pace-goal-grid">
+              <select class="pace-select" id="paceGoalDistance"></select>
+              <input class="pace-text-input" id="paceGoalTime" value="4:00:00" inputmode="numeric">
+            </div>
+          </div>
+
+          <div class="pace-highlight-card">
+            <div class="pace-card-kicker">Required Pace</div>
+            <div class="pace-goal-highlight" id="paceGoalPace">5'41"</div>
+            <div class="pace-copy" style="margin-top:8px;">목표 기록을 위해 평균적으로 유지해야 하는 페이스입니다.</div>
+          </div>
+
+          <div class="pace-card">
+            <div class="pace-card-title">목표 기준 세부 환산</div>
+            <div class="pace-goal-stats" id="paceGoalStats"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pace-panel" id="pace-panel-interval">
+        <div class="pace-grid">
+          <div class="pace-card">
+            <div class="pace-card-title">목표 페이스</div>
+            <div class="pace-input-wrap">
+              <input class="pace-big-input" id="paceIntervalTargetPace" inputmode="numeric" value="4:30">
+              <div class="pace-unit-suffix">/km</div>
+            </div>
+            <div class="pace-card-kicker" style="margin-top:12px; margin-bottom:0;">페이스 프리셋</div>
+            <div class="pace-chip-row" id="paceIntervalPresetRow"></div>
+          </div>
+
+          <div class="pace-card">
+            <div class="pace-card-title">목표 페이스 기준 구간 기록</div>
+            <div class="pace-interval-list" id="paceIntervalList"></div>
+          </div>
+
+          <div class="pace-card">
+            <div class="pace-card-title">마라톤 목표 프리셋</div>
+            <div class="pace-chip-row" id="paceMarathonPresetList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="tab-panel" id="tab-settings">
     <div class="settings-section">
+      <aside class="settings-aside">
+        <div class="settings-card">
+          <div class="section-title">Session Setup</div>
+          <div class="section-copy">
+            타이머의 리듬과 음성 가이드를 한 화면에서 조정합니다.
+            저장 버튼을 누르면 현재 세션에 즉시 반영됩니다.
+          </div>
+          <button class="save-btn" onclick="saveSettings()">설정 저장 & 적용</button>
+        </div>
 
-      <!-- Timer Settings -->
-      <div>
-        <div class="section-title">타이머 설정</div>
-        <div class="setting-group" style="margin-top:14px;">
-          <div class="setting-row">
-            <div style="flex:1;min-width:0;"><div class="setting-label">운동 시간</div><div class="setting-sub">초</div></div>
-            <div class="num-control">
-              <button class="num-btn" onclick="adj('work',-5)">−</button>
-              <span class="num-val" id="workVal">20</span>
-              <button class="num-btn" onclick="adj('work',5)">＋</button>
+        <div class="settings-card">
+          <div class="section-title">Quick Notes</div>
+          <div class="section-copy">
+            운동/휴식 길이와 라운드 수는 즉시 미리보기 값에 반영됩니다.
+            TTS 음성은 브라우저별로 지원 상태가 다를 수 있습니다.
+          </div>
+        </div>
+      </aside>
+
+      <div class="settings-main">
+        <div class="settings-card">
+          <div class="section-title">타이머 설정</div>
+          <div class="setting-group">
+            <div class="setting-row">
+              <div style="flex:1;min-width:0;"><div class="setting-label">운동 시간</div><div class="setting-sub">초 단위 운동 구간</div></div>
+              <div class="num-control">
+                <button class="num-btn" onclick="adj('work',-5)">−</button>
+                <span class="num-val" id="workVal">20</span>
+                <button class="num-btn" onclick="adj('work',5)">＋</button>
+              </div>
+            </div>
+            <div class="setting-row">
+              <div style="flex:1;min-width:0;"><div class="setting-label">휴식 시간</div><div class="setting-sub">초 단위 회복 구간</div></div>
+              <div class="num-control">
+                <button class="num-btn" onclick="adj('rest',-5)">−</button>
+                <span class="num-val" id="restVal">10</span>
+                <button class="num-btn" onclick="adj('rest',5)">＋</button>
+              </div>
+            </div>
+            <div class="setting-row">
+              <div style="flex:1;min-width:0;"><div class="setting-label">라운드 수</div><div class="setting-sub">전체 반복 세트 수</div></div>
+              <div class="num-control">
+                <button class="num-btn" onclick="adj('rounds',-1)">−</button>
+                <span class="num-val" id="roundsVal">8</span>
+                <button class="num-btn" onclick="adj('rounds',1)">＋</button>
+              </div>
+            </div>
+            <div class="setting-row">
+              <div style="flex:1;min-width:0;"><div class="setting-label">목표 횟수</div><div class="setting-sub">운동 구간당 횟수 분할 기준</div></div>
+              <div class="num-control">
+                <button class="num-btn" onclick="adjRep('total',-1)">−</button>
+                <span class="num-val" id="repTotalVal">10</span>
+                <button class="num-btn" onclick="adjRep('total',1)">＋</button>
+              </div>
+            </div>
+            <div class="setting-row">
+              <div style="flex:1;min-width:0;"><div class="setting-label">준비 시간</div><div class="setting-sub">시작 전 카운트다운 길이</div></div>
+              <div class="num-control">
+                <button class="num-btn" onclick="adj('prep',-1)">−</button>
+                <span class="num-val" id="prepVal">5</span>
+                <button class="num-btn" onclick="adj('prep',1)">＋</button>
+              </div>
             </div>
           </div>
-          <div class="setting-row">
-            <div style="flex:1;min-width:0;"><div class="setting-label">휴식 시간</div><div class="setting-sub">초</div></div>
-            <div class="num-control">
-              <button class="num-btn" onclick="adj('rest',-5)">−</button>
-              <span class="num-val" id="restVal">10</span>
-              <button class="num-btn" onclick="adj('rest',5)">＋</button>
+        </div>
+
+        <div class="settings-card">
+          <div class="section-title">음성 안내 설정</div>
+          <div class="setting-group">
+            <div class="setting-row">
+              <div class="setting-label" style="flex:1;">음성 안내 켜기</div>
+              <label class="toggle">
+                <input type="checkbox" id="voiceEnabled" checked>
+                <span class="toggle-slider"></span>
+              </label>
             </div>
-          </div>
-          <div class="setting-row">
-            <div style="flex:1;min-width:0;"><div class="setting-label">라운드 수</div><div class="setting-sub">세트</div></div>
-            <div class="num-control">
-              <button class="num-btn" onclick="adj('rounds',-1)">−</button>
-              <span class="num-val" id="roundsVal">8</span>
-              <button class="num-btn" onclick="adj('rounds',1)">＋</button>
+
+            <div id="ttsStatus">
+              TTS 상태 확인 중...
             </div>
-          </div>
-          <div class="setting-row">
-            <div style="flex:1;min-width:0;"><div class="setting-label">목표 횟수</div><div class="setting-sub">운동 구간당 몇 회</div></div>
-            <div class="num-control">
-              <button class="num-btn" onclick="adjRep('total',-1)">−</button>
-              <span class="num-val" id="repTotalVal">10</span>
-              <button class="num-btn" onclick="adjRep('total',1)">＋</button>
+
+            <div>
+              <div class="setting-label" style="margin-bottom:6px;font-size:13px;">음성 선택</div>
+              <select class="voice-select" id="voiceSelect">
+                <option value="">기본 음성</option>
+              </select>
             </div>
-          </div>
-          <div class="setting-row">
-            <div style="flex:1;min-width:0;"><div class="setting-label">준비 시간</div><div class="setting-sub">시작 전 카운트다운</div></div>
-            <div class="num-control">
-              <button class="num-btn" onclick="adj('prep',-1)">−</button>
-              <span class="num-val" id="prepVal">5</span>
-              <button class="num-btn" onclick="adj('prep',1)">＋</button>
+
+            <div class="setting-row">
+              <div style="flex-shrink:0;min-width:70px;"><div class="setting-label">말하기 속도</div></div>
+              <div class="range-wrap" style="flex:1;">
+                <input type="range" id="rateRange" min="0.5" max="2" step="0.1" value="1" oninput="updateRange('rate')">
+                <span class="range-val" id="rateVal">1.0</span>
+              </div>
+            </div>
+
+            <div class="setting-row">
+              <div style="flex-shrink:0;min-width:70px;"><div class="setting-label">음성 높이</div></div>
+              <div class="range-wrap" style="flex:1;">
+                <input type="range" id="pitchRange" min="0.5" max="2" step="0.1" value="1" oninput="updateRange('pitch')">
+                <span class="range-val" id="pitchVal">1.0</span>
+              </div>
+            </div>
+
+            <div class="setting-row">
+              <div style="flex-shrink:0;min-width:70px;"><div class="setting-label">볼륨</div></div>
+              <div class="range-wrap" style="flex:1;">
+                <input type="range" id="volRange" min="0" max="1" step="0.1" value="1" oninput="updateRange('vol')">
+                <span class="range-val" id="volVal">1.0</span>
+              </div>
+            </div>
+
+            <div class="voice-block">
+              <div class="voice-row-header">
+                <div class="voice-type-label"><span class="dot-work"></span> 운동 시작 안내</div>
+                <button class="test-btn" onclick="testSpeak('work')">🔊 테스트</button>
+              </div>
+              <textarea class="voice-textarea" id="workCue" placeholder="예: 한 줄씩 여러 문구를 넣어보세요" rows="4">[first] {round}라운드 시작. 가볍게 리듬을 만들어봐요.
+[early] {round}라운드 시작. 지금 나를 위한 시간이에요.
+[mid] {round}라운드 시작. 좋아요, 이 흐름 그대로 가요.
+[late] {round}라운드 시작. 거의 다 왔어요. 이번도 충분히 할 수 있어요.
+[last] {round}라운드 시작. 마지막까지 정말 잘 오고 있어요.</textarea>
+              <div class="voice-hint">
+                💡 변수 사용 가능: <code style="color:#FF3D00">{round}</code> = 현재 라운드, <code style="color:#FF3D00">{total}</code> = 전체 라운드<br>라운드 시작 메시지가 나오는 동안에는 횟수 카운트가 자동으로 쉬었다가 이어집니다.
+              </div>
+            </div>
+
+            <div class="setting-row">
+              <div style="flex:1;min-width:0;">
+                <div class="setting-label">휴식 시작 음성</div>
+                <div class="setting-sub">라운드 종료 직후 "00초 쉴게" 안내</div>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="restCueEnabled" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="voice-block">
+              <div class="voice-row-header">
+                <div class="voice-type-label"><span class="dot-rest"></span> 휴식 시작 안내</div>
+                <button class="test-btn" onclick="testSpeak('rest')">🔊 테스트</button>
+              </div>
+              <textarea class="voice-textarea" id="restCue" placeholder="예: {rest}초 쉴게" rows="2">[any] {rest}초 쉴게.</textarea>
+              <div class="voice-hint">💡 변수 사용 가능: <code style="color:#00E5FF">{rest}</code> = 휴식 초, <code style="color:#00E5FF">{round}</code>, <code style="color:#00E5FF">{total}</code></div>
+            </div>
+
+            <div class="voice-block">
+              <div class="voice-row-header">
+                <div class="voice-type-label">⚡ 다음 라운드 준비 안내</div>
+                <label class="toggle" style="transform:scale(0.85);">
+                  <input type="checkbox" id="countdownCueEnabled" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <textarea class="voice-textarea" id="countdownCue" placeholder="예: {next}라운드 준비" rows="2">[any] {next}라운드 준비.</textarea>
+            </div>
+
+            <div class="voice-block">
+              <div class="voice-row-header">
+                <div class="voice-type-label">🔢 남은 시간 카운트</div>
+                <label class="toggle" style="transform:scale(0.85);">
+                  <input type="checkbox" id="countAnnounce" onchange="toggleCountOptions()">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div id="countOptions" style="display:none;flex-direction:column;gap:10px;margin-top:4px;">
+                <div class="setting-row">
+                  <div><div class="setting-label" style="font-size:13px;">읽기 간격</div><div class="setting-sub">초마다 읽기 (1=매초)</div></div>
+                  <div class="num-control">
+                    <button class="num-btn" onclick="adjCount(-1)">−</button>
+                    <span class="num-val" id="countIntervalVal">1</span>
+                    <button class="num-btn" onclick="adjCount(1)">＋</button>
+                  </div>
+                </div>
+                <div>
+                  <div class="setting-label" style="font-size:13px;margin-bottom:6px;">적용 구간</div>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+                      <input type="radio" name="countPhase" value="work" style="accent-color:#FF3D00;"> 운동
+                    </label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+                      <input type="radio" name="countPhase" value="rest" style="accent-color:#00E5FF;"> 휴식
+                    </label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+                      <input type="radio" name="countPhase" value="both" checked style="accent-color:#FFD600;"> 모두
+                    </label>
+                  </div>
+                </div>
+                <div class="voice-hint">💡 예: 간격 5 → 남은 시간이 20, 15, 10, 5초일 때 읽어줍니다</div>
+              </div>
+            </div>
+
+            <div class="voice-block">
+              <div class="voice-row-header">
+                <div class="voice-type-label">💪 운동 횟수 카운트</div>
+                <label class="toggle" style="transform:scale(0.85);">
+                  <input type="checkbox" id="repEnabled" checked onchange="toggleRepOptions()">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div id="repOptions" style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+                <div class="voice-hint" style="background:rgba(255,61,0,0.06);border-radius:12px;padding:10px 12px;">
+                  운동 시간을 목표 횟수로 균등 분할해서 자동으로 읽어줍니다.<br>
+                  예: 운동 20초, 목표 10회 → 2초마다 "1, 2, 3…10"
+                </div>
+                <div>
+                  <div class="setting-label" style="font-size:13px;margin-bottom:6px;">카운트 방향</div>
+                  <div style="display:flex;gap:16px;flex-wrap:wrap;">
+                    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+                      <input type="radio" name="repMode" value="up" checked style="accent-color:#FF3D00;"> 오름차순 (1, 2, 3…)
+                    </label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+                      <input type="radio" name="repMode" value="down" style="accent-color:#FF3D00;"> 내림차순 (10, 9, 8…)
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <div class="setting-label" style="font-size:13px;margin-bottom:6px;">안내 문장</div>
+                  <textarea class="voice-textarea" id="repCue" rows="1" placeholder="예: {count}회">{count}</textarea>
+                  <div class="voice-hint" style="margin-top:6px;">💡 <code style="color:#FF3D00">{count}</code> = 현재 횟수, <code style="color:#FF3D00">{total}</code> = 목표 횟수<br>예) <code>{count}!</code> → "1!", "2!" | <code>{count}번</code> → "1번", "2번"</div>
+                </div>
+                <div id="repPreview" style="font-size:11px;color:#6B6B8A;padding:8px 10px;background:rgba(34,22,15,0.03);border-radius:10px;"></div>
+              </div>
+            </div>
+
+            <div class="voice-block">
+              <div class="voice-row-header">
+                <div class="voice-type-label">🎉 완료 안내</div>
+                <button class="test-btn" onclick="testSpeak('complete')">🔊 테스트</button>
+              </div>
+              <textarea class="voice-textarea" id="completeCue" placeholder="예: 오늘도 해냈어요. 정말 잘했어요!" rows="3">[any] 오늘도 해냈어요. 정말 잘했어요!
+[any] 짧아도 충분히 의미 있었어요. 오늘 루틴 성공이에요.
+[any] 잘했어요. 이 리듬은 분명히 쌓이고 있어요.</textarea>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- Voice Settings -->
-      <div>
-        <div class="section-title">음성 안내 설정</div>
-        <div class="setting-group" style="margin-top:14px;">
-
-          <!-- Enable toggle -->
-          <div class="setting-row">
-            <div class="setting-label" style="flex:1;">음성 안내 켜기</div>
-            <label class="toggle">
-              <input type="checkbox" id="voiceEnabled" checked>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-
-          <!-- TTS status -->
-          <div id="ttsStatus" style="font-size:12px;padding:10px 12px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#6B6B8A;line-height:1.6;">
-            TTS 상태 확인 중...
-          </div>
-
-          <!-- Voice selection -->
-          <div>
-            <div class="setting-label" style="margin-bottom:6px;font-size:13px;">음성 선택</div>
-            <select class="voice-select" id="voiceSelect">
-              <option value="">기본 음성</option>
-            </select>
-          </div>
-
-          <!-- Rate -->
-          <div class="setting-row">
-            <div style="flex-shrink:0;min-width:70px;"><div class="setting-label">말하기 속도</div></div>
-            <div class="range-wrap" style="flex:1;">
-              <input type="range" id="rateRange" min="0.5" max="2" step="0.1" value="1" oninput="updateRange('rate')">
-              <span class="range-val" id="rateVal">1.0</span>
-            </div>
-          </div>
-
-          <!-- Pitch -->
-          <div class="setting-row">
-            <div style="flex-shrink:0;min-width:70px;"><div class="setting-label">음성 높이</div></div>
-            <div class="range-wrap" style="flex:1;">
-              <input type="range" id="pitchRange" min="0.5" max="2" step="0.1" value="1" oninput="updateRange('pitch')">
-              <span class="range-val" id="pitchVal">1.0</span>
-            </div>
-          </div>
-
-          <!-- Volume -->
-          <div class="setting-row">
-            <div style="flex-shrink:0;min-width:70px;"><div class="setting-label">볼륨</div></div>
-            <div class="range-wrap" style="flex:1;">
-              <input type="range" id="volRange" min="0" max="1" step="0.1" value="1" oninput="updateRange('vol')">
-              <span class="range-val" id="volVal">1.0</span>
-            </div>
-          </div>
-
-          <!-- WORK voice cue -->
-          <div class="voice-block">
-            <div class="voice-row-header">
-              <div class="voice-type-label"><span class="dot-work"></span> 운동 시작 안내</div>
-              <button class="test-btn" onclick="testSpeak('work')">🔊 테스트</button>
-            </div>
-            <textarea class="voice-textarea" id="workCue" placeholder="예: 시작! 전력을 다하세요!" rows="2">{round}라운드! 시작!</textarea>
-            <div class="voice-hint">
-              💡 변수 사용 가능: <code style="color:#FF3D00">{round}</code> = 현재 라운드, <code style="color:#FF3D00">{total}</code> = 전체 라운드
-            </div>
-          </div>
-
-          <!-- REST voice cue -->
-          <div class="voice-block">
-            <div class="voice-row-header">
-              <div class="voice-type-label"><span class="dot-rest"></span> 휴식 시작 안내</div>
-              <button class="test-btn" onclick="testSpeak('rest')">🔊 테스트</button>
-            </div>
-            <textarea class="voice-textarea" id="restCue" placeholder="예: 휴식! 잠깐 쉬어가세요." rows="2">휴식. 숨 고르세요.</textarea>
-            <div class="voice-hint">💡 변수 사용 가능: <code style="color:#00E5FF">{round}</code>, <code style="color:#00E5FF">{total}</code></div>
-          </div>
-
-          <!-- 3 sec countdown cue -->
-          <div class="voice-block">
-            <div class="voice-row-header">
-              <div class="voice-type-label">⚡ 3초 전 경고</div>
-              <label class="toggle" style="transform:scale(0.85);">
-                <input type="checkbox" id="countdownCueEnabled" checked>
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-            <textarea class="voice-textarea" id="countdownCue" placeholder="예: 곧 시작합니다" rows="1">곧 시작합니다</textarea>
-          </div>
-
-          <!-- Count announce -->
-          <div class="voice-block">
-            <div class="voice-row-header">
-              <div class="voice-type-label">🔢 남은 시간 카운트</div>
-              <label class="toggle" style="transform:scale(0.85);">
-                <input type="checkbox" id="countAnnounce" onchange="toggleCountOptions()">
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-            <div id="countOptions" style="display:none;flex-direction:column;gap:10px;margin-top:4px;">
-              <div class="setting-row">
-                <div><div class="setting-label" style="font-size:13px;">읽기 간격</div><div class="setting-sub">초마다 읽기 (1=매초)</div></div>
-                <div class="num-control">
-                  <button class="num-btn" onclick="adjCount(-1)">−</button>
-                  <span class="num-val" id="countIntervalVal">1</span>
-                  <button class="num-btn" onclick="adjCount(1)">＋</button>
-                </div>
-              </div>
-              <div>
-                <div class="setting-label" style="font-size:13px;margin-bottom:6px;">적용 구간</div>
-                <div style="display:flex;gap:8px;">
-                  <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
-                    <input type="radio" name="countPhase" value="work" style="accent-color:#FF3D00;"> 운동
-                  </label>
-                  <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
-                    <input type="radio" name="countPhase" value="rest" style="accent-color:#00E5FF;"> 휴식
-                  </label>
-                  <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
-                    <input type="radio" name="countPhase" value="both" checked style="accent-color:#FFD600;"> 모두
-                  </label>
-                </div>
-              </div>
-              <div class="voice-hint">💡 예: 간격 5 → 남은 시간이 20, 15, 10, 5초일 때 읽어줍니다</div>
-            </div>
-          </div>
-
-          <!-- Rep count announce -->
-          <div class="voice-block">
-            <div class="voice-row-header">
-              <div class="voice-type-label">💪 운동 횟수 카운트</div>
-              <label class="toggle" style="transform:scale(0.85);">
-                <input type="checkbox" id="repEnabled" checked onchange="toggleRepOptions()">
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-            <div id="repOptions" style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
-              <div class="voice-hint" style="background:rgba(255,61,0,0.06);border-radius:6px;padding:8px 10px;">
-                운동 시간을 목표 횟수로 균등 분할해서 자동으로 읽어줍니다.<br>
-                예: 운동 20초, 목표 10회 → 2초마다 "1, 2, 3…10"
-              </div>
-              <div>
-                <div class="setting-label" style="font-size:13px;margin-bottom:6px;">카운트 방향</div>
-                <div style="display:flex;gap:16px;">
-                  <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
-                    <input type="radio" name="repMode" value="up" checked style="accent-color:#FF3D00;"> 오름차순 (1, 2, 3…)
-                  </label>
-                  <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
-                    <input type="radio" name="repMode" value="down" style="accent-color:#FF3D00;"> 내림차순 (10, 9, 8…)
-                  </label>
-                </div>
-              </div>
-              <div>
-                <div class="setting-label" style="font-size:13px;margin-bottom:6px;">안내 문장</div>
-                <textarea class="voice-textarea" id="repCue" rows="1" placeholder="예: {count}회">{count}</textarea>
-                <div class="voice-hint" style="margin-top:6px;">💡 <code style="color:#FF3D00">{count}</code> = 현재 횟수, <code style="color:#FF3D00">{total}</code> = 목표 횟수<br>예) <code>{count}!</code> → "1!", "2!" &nbsp;|&nbsp; <code>{count}번</code> → "1번", "2번"</div>
-              </div>
-              <div id="repPreview" style="font-size:11px;color:#6B6B8A;padding:6px 10px;background:rgba(255,255,255,0.03);border-radius:6px;"></div>
-            </div>
-          </div>
-
-          <!-- Complete cue -->
-          <div class="voice-block">
-            <div class="voice-row-header">
-              <div class="voice-type-label">🎉 완료 안내</div>
-              <button class="test-btn" onclick="testSpeak('complete')">🔊 테스트</button>
-            </div>
-            <textarea class="voice-textarea" id="completeCue" placeholder="예: 타바타 완료! 수고했습니다." rows="2">타바타 완료! 정말 수고했어요!</textarea>
-          </div>
-
-        </div>
-      </div>
-
-      <button class="save-btn" onclick="saveSettings()">설정 저장 & 적용</button>
     </div>
   </div>
+</div>
 
-</div><!-- app-wrapper -->
-
-<!-- Countdown Overlay -->
 <div class="countdown-overlay" id="countdownOverlay">
   <div class="countdown-label">준비하세요</div>
   <div class="countdown-num" id="countdownNum">5</div>
 </div>
 
-<!-- Flash Overlay -->
 <div class="flash-overlay" id="flashOverlay"></div>
 
-<!-- Complete Overlay -->
 <div class="complete-overlay" id="completeOverlay">
   <div class="complete-title">WELL DONE!</div>
   <div class="complete-stats" id="completeStats"></div>
@@ -894,11 +1921,18 @@ let cfg = {
   work: 20, rest: 10, rounds: 8, prep: 5,
   voiceEnabled: true,
   voiceIdx: -1, rate: 1.0, pitch: 1.0, vol: 1.0,
-  workCue: '{round}라운드! 시작!',
-  restCue: '휴식. 숨 고르세요.',
-  countdownCue: '곧 시작합니다',
+  workCue: `[first] {round}라운드 시작. 가볍게 리듬을 만들어봐요.
+[early] {round}라운드 시작. 지금 나를 위한 시간이에요.
+[mid] {round}라운드 시작. 좋아요, 이 흐름 그대로 가요.
+[late] {round}라운드 시작. 거의 다 왔어요. 이번도 충분히 할 수 있어요.
+[last] {round}라운드 시작. 마지막까지 정말 잘 오고 있어요.`,
+  restCueEnabled: true,
+  restCue: `[any] {rest}초 쉴게.`,
+  countdownCue: `[any] {next}라운드 준비.`,
   countdownCueEnabled: true,
-  completeCue: '타바타 완료! 정말 수고했어요!',
+  completeCue: `[any] 오늘도 해냈어요. 정말 잘했어요!
+[any] 짧아도 충분히 의미 있었어요. 오늘 루틴 성공이에요.
+[any] 잘했어요. 이 리듬은 분명히 쌓이고 있어요.`,
   countAnnounce: false,      // 남은 시간 음성 카운트
   countInterval: 1,          // 몇 초마다 읽을지 (1=매초, 5=5초마다 등)
   countPhase: 'both',        // 'work' | 'rest' | 'both'
@@ -917,7 +1951,8 @@ let state = {
   totalTime: 0,
   timer: null,
   repTimer: null,
-  prepTimer: null
+  prepTimer: null,
+  currentCueText: null
 };
 
 let voices = [];
@@ -925,6 +1960,50 @@ const TTS = window.speechSynthesis || null;
 let audioCtx = null;
 let audioUnlocked = false;
 const STORAGE_KEY = 'tabata-voice-coach-settings-v1';
+const ACTIVE_TAB_KEY = 'tabata-voice-coach-active-tab-v1';
+const LEGACY_CUES = {
+  workCue: [
+    '{round}라운드! 시작!',
+    '{round}라운드, 지금 나를 위한 시간!',
+    `[first] 시작해볼게요.
+[any] {round}라운드 시작.
+[last] 마지막 라운드 시작.`,
+    `[first] {round}라운드, 가볍게 시작해봐요.
+[early] {round}라운드, 지금 나를 위한 시간!
+[mid] 좋아요. 이 리듬 그대로 가요.
+[late] 거의 다 왔어요. 이번 라운드도 충분히 할 수 있어요.
+[last] 마지막 라운드예요. 여기까지 온 것만으로도 정말 잘했어요.`
+  ],
+  restCue: [
+    '휴식. 숨 고르세요.',
+    '좋아요. 잠깐 숨 고르고 다시 가요.',
+    `[any] 잘했어요. 잠깐 쉴게요.
+[mid] 좋아요. 숨만 잠깐 고를게요.
+[late] 잘하고 있어요. 조금만 쉬어요.
+[skip]`
+  ],
+  countdownCue: [
+    '곧 시작합니다',
+    '좋아, 바로 시작해요',
+    `[any] 이제 다시 가볼게요.
+[any] 좋아요. 다시 시작해요.
+[any] 다음 라운드 갑니다.`
+  ],
+  completeCue: ['타바타 완료! 정말 수고했어요!', '오늘도 해냈어요. 정말 잘했어요!']
+};
+const REFRESHED_CUES = {
+  workCue: `[first] {round}라운드 시작. 가볍게 리듬을 만들어봐요.
+[early] {round}라운드 시작. 지금 나를 위한 시간이에요.
+[mid] {round}라운드 시작. 좋아요, 이 흐름 그대로 가요.
+[late] {round}라운드 시작. 거의 다 왔어요. 이번도 충분히 할 수 있어요.
+[last] {round}라운드 시작. 마지막까지 정말 잘 오고 있어요.`,
+  restCue: `[any] {rest}초 쉴게.`,
+  countdownCue: `[any] {next}라운드 준비.`,
+  completeCue: `[any] 오늘도 해냈어요. 정말 잘했어요!
+[any] 짧아도 충분히 의미 있었어요. 오늘 루틴 성공이에요.
+[any] 잘했어요. 이 리듬은 분명히 쌓이고 있어요.`
+};
+const cueHistory = { work: [], rest: [], countdown: [], complete: [] };
 
 // ===== AudioContext: unlock on first user gesture =====
 function unlockAudio() {
@@ -978,6 +2057,14 @@ function loadSettings() {
     if (!raw) return;
     const saved = JSON.parse(raw);
     cfg = { ...cfg, ...saved };
+    Object.entries(LEGACY_CUES).forEach(([key, legacyValues]) => {
+      if (legacyValues.includes(saved[key])) {
+        cfg[key] = REFRESHED_CUES[key];
+      }
+    });
+    if (typeof saved.restCue === 'string' && saved.restCue.includes('[skip]')) {
+      cfg.restCue = REFRESHED_CUES.restCue;
+    }
   } catch (e) {
     console.warn('Failed to load settings:', e);
   }
@@ -1055,16 +2142,680 @@ function initUI() {
   document.getElementById('prepVal').textContent = cfg.prep;
   document.getElementById('timeNum').textContent = cfg.work;
   document.getElementById('roundInfo').textContent = `라운드 — / ${cfg.rounds}`;
+  document.getElementById('voiceCueText').textContent = '좋아요. 한 번에 완벽할 필요 없이 오늘 한 세트면 충분해요';
+  document.querySelector('.timer-stage')?.classList.add('state-prep');
+  updateMotivationMessage();
   buildDots();
 }
 initUI();
 
+function updateMotivationMessage() {
+  const titleEl = document.getElementById('motivationTitle');
+  const copyEl = document.getElementById('motivationCopy');
+  if (!titleEl || !copyEl) return;
+
+  const hour = new Date().getHours();
+  let message;
+
+  if (hour >= 5 && hour < 11) {
+    message = {
+      title: '가볍게 시작하면 충분해요',
+      copy: '아침의 짧은 한 세트가 오늘 하루의 리듬을 더 산뜻하게 만들어줘요.'
+    };
+  } else if (hour >= 11 && hour < 16) {
+    message = {
+      title: '지금은 나를 챙기는 시간',
+      copy: '바쁜 시간 사이에도 내 몸을 위한 몇 분은 분명한 에너지가 됩니다.'
+    };
+  } else if (hour >= 16 && hour < 21) {
+    message = {
+      title: '오늘도 해낸 나, 꽤 멋진데?',
+      copy: '지금 필요한 건 완벽함보다 시작이에요. 오늘의 20초가 분명히 쌓입니다.'
+    };
+  } else {
+    message = {
+      title: '오늘 하루도 잘 버텼어요',
+      copy: '무리하지 말고 내 호흡에 맞춰 움직여요. 짧게 해도 충분히 의미 있어요.'
+    };
+  }
+
+  titleEl.textContent = message.title;
+  copyEl.textContent = message.copy;
+}
+
 // ===== TABS =====
 function showTab(id, btn) {
+  const panel = document.getElementById('tab-' + id);
+  if (!panel) return;
+
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + id).classList.add('active');
+  panel.classList.add('active');
+  (btn || document.querySelector(`.tab-btn[data-tab="${id}"]`))?.classList.add('active');
+
+  try {
+    localStorage.setItem(ACTIVE_TAB_KEY, id);
+  } catch (e) {
+    console.warn('Failed to persist active tab:', e);
+  }
+}
+
+function restoreActiveTab() {
+  try {
+    const savedTab = localStorage.getItem(ACTIVE_TAB_KEY);
+    if (savedTab) {
+      showTab(savedTab);
+      return;
+    }
+  } catch (e) {
+    console.warn('Failed to restore active tab:', e);
+  }
+
+  const defaultTab = document.querySelector('.tab-btn.active')?.dataset.tab || 'timer';
+  showTab(defaultTab);
+}
+
+const PACE_INPUT_UNITS = [
+  { key: 'pace', label: 'km 페이스', unit: '/km', hint: '예: 4:30', presets: ['3:30', '4:00', '4:30', '5:00', '5:30', '6:00'] },
+  { key: 'speed', label: '시속', unit: 'km/h', hint: '예: 13.3', presets: ['8', '10', '12', '13', '14', '15', '16'] },
+  { key: 'm100', label: '100m', unit: '초', hint: '예: 27', presets: ['20', '24', '27', '30', '33', '36'] },
+  { key: 'm400', label: '400m', unit: '랩', hint: '예: 1:48', presets: ['1:20', '1:30', '1:40', '1:48', '2:00', '2:12'] },
+  { key: 'km5', label: '5K 기록', unit: '기록', hint: '예: 25:00', presets: ['20:00', '22:30', '25:00', '27:30', '30:00'] },
+  { key: 'km10', label: '10K 기록', unit: '기록', hint: '예: 50:00', presets: ['40:00', '45:00', '50:00', '55:00', '1:00:00'] },
+  { key: 'half', label: '하프 기록', unit: '기록', hint: '예: 1:50:00', presets: ['1:30:00', '1:40:00', '1:50:00', '2:00:00'] },
+  { key: 'full', label: '풀코스 기록', unit: '기록', hint: '예: 4:00:00', presets: ['2:30:00', '3:00:00', '3:30:00', '4:00:00', '4:30:00', '5:00:00'] }
+];
+
+const PACE_DISTANCES = [
+  { key: '1k', label: '1K', km: 1 },
+  { key: '3k', label: '3K', km: 3 },
+  { key: '5k', label: '5K', km: 5 },
+  { key: '10k', label: '10K', km: 10 },
+  { key: 'half', label: '하프', km: 21.0975 },
+  { key: 'full', label: '풀코스', km: 42.195 }
+];
+
+const PACE_PREDICTION_ROWS = [
+  { label: '0-5K', startKm: 0, endKm: 5, type: 'segment' },
+  { label: '5-10K', startKm: 5, endKm: 10, type: 'segment' },
+  { label: '10-15K', startKm: 10, endKm: 15, type: 'segment' },
+  { label: '15-20K', startKm: 15, endKm: 20, type: 'segment' },
+  { label: '20-25K', startKm: 20, endKm: 25, type: 'segment' },
+  { label: '25-30K', startKm: 25, endKm: 30, type: 'segment' },
+  { label: '30-35K', startKm: 30, endKm: 35, type: 'segment' },
+  { label: '35-40K', startKm: 35, endKm: 40, type: 'segment' },
+  { label: '풀코스', startKm: 0, endKm: 42.195, type: 'full', note: '전체평균' }
+];
+
+const PACE_PREDICTION_SCENARIOS = [
+  { key: 'aggressive', label: '공격적', marathonFactor: 0.97 },
+  { key: 'steady', label: '보통', marathonFactor: 1 },
+  { key: 'safe', label: '안정적', marathonFactor: 1.05 }
+];
+
+const INTERVAL_PACE_PRESETS = ['3:30', '4:00', '4:30', '5:00', '5:30', '6:00'];
+
+const PACE_MARATHON_PRESETS = [
+  { label: '서브3', hours: 3 },
+  { label: '서브3.5', hours: 3.5 },
+  { label: '서브4', hours: 4 },
+  { label: '서브5', hours: 5 }
+];
+
+const MARATHON_PROFILE_SPECS = [
+  {
+    marathonSec: 2.5 * 3600,
+    splits: [
+      [5, '3:34'], [10, '3:33'], [15, '3:33'], [20, '3:32'], [21.0975, '3:32'],
+      [25, '3:33'], [30, '3:34'], [35, '3:35'], [40, '3:36'], [42.195, '3:35']
+    ]
+  },
+  {
+    marathonSec: 3 * 3600,
+    splits: [
+      [5, '4:15'], [10, '4:15'], [15, '4:16'], [20, '4:16'], [21.0975, '4:16'],
+      [25, '4:18'], [30, '4:20'], [35, '4:25'], [40, '4:30'], [42.195, '4:28']
+    ]
+  },
+  {
+    marathonSec: 4 * 3600,
+    splits: [
+      [5, '5:35'], [10, '5:38'], [15, '5:40'], [20, '5:45'], [21.0975, '5:45'],
+      [25, '5:50'], [30, '6:00'], [35, '6:15'], [40, '6:30'], [42.195, '6:25']
+    ]
+  },
+  {
+    marathonSec: 5 * 3600,
+    splits: [
+      [5, '6:50'], [10, '6:55'], [15, '7:00'], [20, '7:05'], [21.0975, '7:05'],
+      [25, '7:15'], [30, '7:30'], [35, '7:50'], [40, '8:10'], [42.195, '8:00']
+    ]
+  }
+];
+
+let paceState = {
+  tab: 'convert',
+  inputUnit: 'pace',
+  inputValue: '4:30',
+  goalDistance: 42.195,
+  goalTime: '4:00:00',
+  predictionScenario: 'steady',
+  intervalTargetPace: '4:30',
+  intervalDistance: 400
+};
+
+function parseClock(value) {
+  const input = String(value || '').trim();
+  if (!input) return 0;
+
+  if (!input.includes(':')) {
+    const seconds = Number.parseFloat(input);
+    return Number.isFinite(seconds) && seconds > 0 ? seconds : 0;
+  }
+
+  const parts = input.split(':').map((part) => part.trim());
+  if (parts.some((part) => part === '')) return 0;
+
+  const numbers = parts.map((part) => Number.parseInt(part, 10));
+  if (numbers.some((part) => !Number.isFinite(part) || part < 0)) return 0;
+
+  return numbers.reduce((total, part) => total * 60 + part, 0);
+}
+
+function formatTime(sec, includeHours = false) {
+  if (!Number.isFinite(sec) || sec <= 0) return '-';
+
+  const rounded = Math.round(sec);
+  const hours = Math.floor(rounded / 3600);
+  const minutes = Math.floor((rounded % 3600) / 60);
+  const seconds = rounded % 60;
+
+  if (includeHours || hours > 0) {
+    return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  }
+
+  return `${minutes}:${String(seconds).padStart(2, '0')}`;
+}
+
+function paceToInput(sec) {
+  if (!Number.isFinite(sec) || sec <= 0) return '';
+  const rounded = Math.round(sec);
+  const minutes = Math.floor(rounded / 60);
+  const seconds = rounded % 60;
+  return `${minutes}:${String(seconds).padStart(2, '0')}`;
+}
+
+function getPaceSourceDistance(unitKey) {
+  const distances = {
+    pace: 1,
+    speed: 1,
+    m100: 0.1,
+    m400: 0.4,
+    km5: 5,
+    km10: 10,
+    half: 21.0975,
+    full: 42.195
+  };
+  return distances[unitKey] || 1;
+}
+
+function getPredictionBenchmarkDistance(unitKey) {
+  const distances = {
+    pace: 10,
+    speed: 10,
+    m100: 3,
+    m400: 5,
+    km5: 5,
+    km10: 10,
+    half: 21.0975,
+    full: 42.195
+  };
+  return distances[unitKey] || 10;
+}
+
+function formatPredictionTime(sec, distanceKm) {
+  return formatTime(sec, sec >= 3600 || distanceKm >= 21);
+}
+
+function paceTextToSeconds(text) {
+  return parseClock(text);
+}
+
+function buildMarathonProfiles() {
+  return MARATHON_PROFILE_SPECS.map((profile) => ({
+    marathonSec: profile.marathonSec,
+    splits: profile.splits.map(([km, pace]) => ({
+      km,
+      paceSec: paceTextToSeconds(pace)
+    }))
+  }));
+}
+
+const MARATHON_PROFILES = buildMarathonProfiles();
+
+function interpolateValue(x1, y1, x2, y2, x) {
+  if (Math.abs(x2 - x1) < 0.000001) return y1;
+  return y1 + ((x - x1) / (x2 - x1)) * (y2 - y1);
+}
+
+function estimateEquivalentMarathonSec(paceSec, unitKey, scenarioKey) {
+  const benchmarkDistanceKm = getPredictionBenchmarkDistance(unitKey);
+  const benchmarkTimeSec = paceSec * benchmarkDistanceKm;
+  const baseMarathonSec = benchmarkTimeSec * Math.pow(42.195 / benchmarkDistanceKm, 1.06);
+  const scenario = PACE_PREDICTION_SCENARIOS.find((item) => item.key === scenarioKey) || PACE_PREDICTION_SCENARIOS[1];
+  return baseMarathonSec * scenario.marathonFactor;
+}
+
+function getBlendedMarathonProfile(marathonSec) {
+  const profiles = MARATHON_PROFILES;
+  if (marathonSec <= profiles[0].marathonSec) return profiles[0].splits;
+  if (marathonSec >= profiles[profiles.length - 1].marathonSec) return profiles[profiles.length - 1].splits;
+
+  for (let i = 0; i < profiles.length - 1; i += 1) {
+    const left = profiles[i];
+    const right = profiles[i + 1];
+    if (marathonSec >= left.marathonSec && marathonSec <= right.marathonSec) {
+      return left.splits.map((split, index) => ({
+        km: split.km,
+        paceSec: interpolateValue(left.marathonSec, split.paceSec, right.marathonSec, right.splits[index].paceSec, marathonSec)
+      }));
+    }
+  }
+
+  return profiles[profiles.length - 1].splits;
+}
+
+function getProfilePaceAtDistance(profileSplits, targetDistanceKm) {
+  if (!profileSplits.length) return 0;
+  if (targetDistanceKm <= profileSplits[0].km) return profileSplits[0].paceSec;
+
+  for (let i = 1; i < profileSplits.length; i += 1) {
+    const prev = profileSplits[i - 1];
+    const current = profileSplits[i];
+    if (targetDistanceKm <= current.km) {
+      return interpolateValue(prev.km, prev.paceSec, current.km, current.paceSec, targetDistanceKm);
+    }
+  }
+
+  return profileSplits[profileSplits.length - 1].paceSec;
+}
+
+function integrateProfileTime(profileSplits, targetDistanceKm) {
+  if (!profileSplits.length || targetDistanceKm <= 0) return 0;
+
+  let totalTimeSec = 0;
+  let prevKm = 0;
+  let prevPaceSec = profileSplits[0].paceSec;
+
+  for (let i = 0; i < profileSplits.length; i += 1) {
+    const current = profileSplits[i];
+    const segmentEndKm = Math.min(targetDistanceKm, current.km);
+    if (segmentEndKm > prevKm) {
+      const endPaceSec = getProfilePaceAtDistance(profileSplits, segmentEndKm);
+      totalTimeSec += ((prevPaceSec + endPaceSec) / 2) * (segmentEndKm - prevKm);
+      prevKm = segmentEndKm;
+      prevPaceSec = endPaceSec;
+    }
+    if (targetDistanceKm <= current.km) return totalTimeSec;
+    prevPaceSec = current.paceSec;
+    prevKm = current.km;
+  }
+
+  return totalTimeSec;
+}
+
+function buildPredictionModel(paceSec, unitKey, scenarioKey) {
+  const benchmarkDistanceKm = getPredictionBenchmarkDistance(unitKey);
+  const benchmarkTimeSec = paceSec * benchmarkDistanceKm;
+  const equivalentMarathonSec = estimateEquivalentMarathonSec(paceSec, unitKey, scenarioKey);
+  const profileSplits = getBlendedMarathonProfile(equivalentMarathonSec);
+  const profileBenchmarkTimeSec = integrateProfileTime(profileSplits, benchmarkDistanceKm);
+  const scale = profileBenchmarkTimeSec > 0 ? benchmarkTimeSec / profileBenchmarkTimeSec : 1;
+  return { profileSplits, scale };
+}
+
+function getScaledCumulativeTime(model, distanceKm) {
+  if (!model) return 0;
+  return integrateProfileTime(model.profileSplits, distanceKm) * model.scale;
+}
+
+function formatPaceDisplay(sec) {
+  if (!Number.isFinite(sec) || sec <= 0) return '-';
+  const rounded = Math.round(sec);
+  const m = Math.floor(rounded / 60);
+  const s = rounded % 60;
+  return `${m}'${String(s).padStart(2, '0')}"`;
+}
+
+function getPaceSecondsFromState() {
+  const value = String(paceState.inputValue || '').trim();
+  const unit = paceState.inputUnit;
+  const parsed = parseClock(value);
+
+  if (unit === 'pace') return parsed;
+  if (unit === 'speed') {
+    const speed = parseFloat(value);
+    return speed > 0 ? 3600 / speed : 0;
+  }
+  if (unit === 'm100') {
+    const sec = parseFloat(value);
+    return sec > 0 ? sec * 10 : 0;
+  }
+  if (unit === 'm400') return parsed > 0 ? parsed / 0.4 : 0;
+  if (unit === 'km5') return parsed > 0 ? parsed / 5 : 0;
+  if (unit === 'km10') return parsed > 0 ? parsed / 10 : 0;
+  if (unit === 'half') return parsed > 0 ? parsed / 21.0975 : 0;
+  if (unit === 'full') return parsed > 0 ? parsed / 42.195 : 0;
+  return 0;
+}
+
+function convertPaceToPreview(unitKey, paceSec) {
+  if (!paceSec) return '-';
+  if (unitKey === 'pace') return formatPaceDisplay(paceSec);
+  if (unitKey === 'speed') return `${(3600 / paceSec).toFixed(1)}`;
+  if (unitKey === 'm100') return `${(paceSec / 10).toFixed(1)}초`;
+  if (unitKey === 'm400') return formatTime(paceSec * 0.4);
+  if (unitKey === 'km5') return formatTime(paceSec * 5);
+  if (unitKey === 'km10') return formatTime(paceSec * 10);
+  if (unitKey === 'half') return formatTime(paceSec * 21.0975, true);
+  if (unitKey === 'full') return formatTime(paceSec * 42.195, true);
+  return '-';
+}
+
+function convertPaceToInputValue(unitKey, paceSec) {
+  if (!paceSec) {
+    return (PACE_INPUT_UNITS.find(unit => unit.key === unitKey)?.presets || [''])[0];
+  }
+  if (unitKey === 'pace') return paceToInput(paceSec);
+  if (unitKey === 'speed') return (3600 / paceSec).toFixed(1);
+  if (unitKey === 'm100') return (paceSec / 10).toFixed(1);
+  if (unitKey === 'm400') return formatTime(paceSec * 0.4);
+  if (unitKey === 'km5') return formatTime(paceSec * 5);
+  if (unitKey === 'km10') return formatTime(paceSec * 10);
+  if (unitKey === 'half') return formatTime(paceSec * 21.0975, true);
+  if (unitKey === 'full') return formatTime(paceSec * 42.195, true);
+  return '';
+}
+
+function showPaceTab(id, btn) {
+  paceState.tab = id;
+  document.querySelectorAll('.pace-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.pace-tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('pace-panel-' + id)?.classList.add('active');
   if (btn) btn.classList.add('active');
+}
+
+function setPaceInputUnit(unitKey) {
+  const unit = PACE_INPUT_UNITS.find(item => item.key === unitKey);
+  if (!unit) return;
+  const currentPaceSec = getPaceSecondsFromState();
+  paceState.inputUnit = unitKey;
+  paceState.inputValue = convertPaceToInputValue(unitKey, currentPaceSec);
+  renderPaceConverter();
+}
+
+function setPacePreset(value) {
+  paceState.inputValue = value;
+  renderPaceConverter();
+}
+
+function setPacePredictionScenario(key) {
+  if (!PACE_PREDICTION_SCENARIOS.some((scenario) => scenario.key === key)) return;
+  paceState.predictionScenario = key;
+  renderPaceConverter();
+}
+
+function fillNode(node, children) {
+  if (!node) return;
+  node.replaceChildren(...children);
+}
+
+function renderPaceConverter() {
+  const paceSec = getPaceSecondsFromState();
+  const unitGrid = document.getElementById('paceUnitGrid');
+  const presetRow = document.getElementById('pacePresetRow');
+  const inputEl = document.getElementById('paceInputValue');
+  const unitLabelEl = document.getElementById('paceInputUnitLabel');
+  const scenarioTabs = document.getElementById('paceScenarioTabs');
+  if (!unitGrid || !presetRow || !inputEl || !unitLabelEl || !scenarioTabs) return;
+
+  const selectedUnit = PACE_INPUT_UNITS.find(unit => unit.key === paceState.inputUnit) || PACE_INPUT_UNITS[0];
+  const unitButtons = PACE_INPUT_UNITS.map(unit => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `pace-unit-btn ${unit.key === paceState.inputUnit ? 'active' : ''}`;
+    button.addEventListener('click', () => setPaceInputUnit(unit.key));
+
+    const name = document.createElement('div');
+    name.className = 'pace-unit-name';
+    name.textContent = unit.label;
+
+    const preview = document.createElement('div');
+    preview.className = 'pace-unit-preview';
+    
+    const previewValue = document.createElement('span');
+    previewValue.className = 'pace-unit-preview-value';
+    previewValue.textContent = convertPaceToPreview(unit.key, paceSec);
+
+    const unitText = document.createElement('span');
+    unitText.className = 'pace-unit-preview-unit';
+    unitText.textContent = unit.unit;
+    preview.append(previewValue, unitText);
+
+    button.append(name, preview);
+    return button;
+  });
+  fillNode(unitGrid, unitButtons);
+
+  inputEl.value = paceState.inputValue;
+  inputEl.placeholder = selectedUnit.hint;
+  unitLabelEl.textContent = selectedUnit.unit;
+
+  const presetButtons = selectedUnit.presets.map(value => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'pace-chip';
+    button.textContent = value;
+    button.addEventListener('click', () => setPacePreset(value));
+    return button;
+  });
+  fillNode(presetRow, presetButtons);
+
+  const scenarioButtons = PACE_PREDICTION_SCENARIOS.map((scenario) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `pace-scenario-btn ${paceState.predictionScenario === scenario.key ? 'active' : ''}`;
+    button.textContent = scenario.label;
+    button.addEventListener('click', () => setPacePredictionScenario(scenario.key));
+    return button;
+  });
+  fillNode(scenarioTabs, scenarioButtons);
+
+  document.getElementById('paceStatPace').textContent = formatPaceDisplay(paceSec);
+  document.getElementById('paceStatSpeed').textContent = paceSec ? (3600 / paceSec).toFixed(1) : '-';
+  document.getElementById('paceStat100m').textContent = paceSec ? `${(paceSec / 10).toFixed(1)}초` : '-';
+
+  const predictionList = document.getElementById('pacePredictionList');
+  const predictionModel = paceSec ? buildPredictionModel(paceSec, paceState.inputUnit, paceState.predictionScenario) : null;
+  predictionList.innerHTML = PACE_PREDICTION_ROWS.map((row) => {
+    if (!paceSec) {
+      return `
+        <div class="pace-list-row">
+          <div>
+            <div class="pace-row-label">${row.label}</div>
+            ${row.note ? `<div class="pace-row-meta">${row.note}</div>` : ''}
+          </div>
+          <div class="pace-prediction-stack">
+            <div class="pace-row-value">-</div>
+          </div>
+        </div>
+      `;
+    }
+
+    const startTimeSec = row.type === 'segment' ? getScaledCumulativeTime(predictionModel, row.startKm) : 0;
+    const endTimeSec = getScaledCumulativeTime(predictionModel, row.endKm);
+    const displayTimeSec = row.type === 'segment' ? Math.max(0, endTimeSec - startTimeSec) : endTimeSec;
+    const displayDistanceKm = row.type === 'segment' ? row.endKm - row.startKm : row.endKm;
+    const displayPaceText = displayDistanceKm > 0 ? formatPaceDisplay(displayTimeSec / displayDistanceKm) : '-';
+    const displayTimeText = row.type === 'segment' ? formatTime(displayTimeSec) : formatTime(displayTimeSec, true);
+
+    return `
+      <div class="pace-list-row">
+        <div>
+          <div class="pace-row-label">${row.label}</div>
+          ${row.note ? `<div class="pace-row-meta">${row.note}</div>` : ''}
+        </div>
+        <div class="pace-prediction-stack">
+          <div class="pace-row-value"><span class="pace-row-subvalue">${displayPaceText} /km</span> ${displayTimeText}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const trainingList = document.getElementById('paceTrainingList');
+  if (paceSec) {
+    const zones = [
+      { label: '이지런', pace: `${formatPaceDisplay(paceSec * 1.18)} ~ ${formatPaceDisplay(paceSec * 1.32)}`, desc: '회복·장거리' },
+      { label: '마라톤', pace: formatPaceDisplay(paceSec * 1.05), desc: '지속주 기준' },
+      { label: '템포런', pace: formatPaceDisplay(paceSec * 0.94), desc: '역치 훈련' },
+      { label: '인터벌', pace: formatPaceDisplay(paceSec * 0.86), desc: '400m 반복' }
+    ];
+    trainingList.innerHTML = zones.map(zone => `
+      <div class="pace-list-row">
+        <div>
+          <div class="pace-row-label">${zone.label}</div>
+          <div class="pace-training-desc">${zone.desc}</div>
+        </div>
+        <div class="pace-row-value">${zone.pace}</div>
+      </div>
+    `).join('');
+  } else {
+    trainingList.innerHTML = `<div class="pace-empty">값을 입력하면 추천 훈련 페이스가 계산됩니다.</div>`;
+  }
+
+  renderPaceGoal();
+  renderPaceInterval();
+}
+
+function renderPaceGoal() {
+  const distanceSelect = document.getElementById('paceGoalDistance');
+  const timeInput = document.getElementById('paceGoalTime');
+  const goalPaceEl = document.getElementById('paceGoalPace');
+  const goalStatsEl = document.getElementById('paceGoalStats');
+  if (!distanceSelect || !timeInput || !goalPaceEl || !goalStatsEl) return;
+
+  distanceSelect.innerHTML = PACE_DISTANCES.filter(item => item.km >= 5).map(item => `
+    <option value="${item.km}" ${Number(paceState.goalDistance) === item.km ? 'selected' : ''}>${item.label}</option>
+  `).join('');
+  timeInput.value = paceState.goalTime;
+
+  const goalSeconds = parseClock(paceState.goalTime);
+  const goalPace = goalSeconds > 0 && paceState.goalDistance > 0 ? goalSeconds / paceState.goalDistance : 0;
+  goalPaceEl.textContent = formatPaceDisplay(goalPace);
+
+  const stats = [
+    { label: '시속', value: goalPace ? `${(3600 / goalPace).toFixed(2)} km/h` : '-' },
+    { label: '400m 랩', value: goalPace ? formatTime(goalPace * 0.4) : '-' },
+    { label: '100m', value: goalPace ? `${(goalPace / 10).toFixed(1)}초` : '-' },
+    { label: '5K 예상', value: goalPace ? formatTime(goalPace * 5) : '-' }
+  ];
+
+  goalStatsEl.innerHTML = stats.map(stat => `
+    <div class="pace-list-row">
+      <div class="pace-row-label">${stat.label}</div>
+      <div class="pace-row-value">${stat.value}</div>
+    </div>
+  `).join('');
+}
+
+function setPaceGoalDistance(value) {
+  paceState.goalDistance = Number(value);
+  renderPaceGoal();
+  renderPaceInterval();
+}
+
+function setPaceGoalTime(value) {
+  paceState.goalTime = value;
+  renderPaceGoal();
+  renderPaceInterval();
+}
+
+function renderPaceInterval() {
+  const intervalPaceInput = document.getElementById('paceIntervalTargetPace');
+  const intervalList = document.getElementById('paceIntervalList');
+  const intervalPresetRow = document.getElementById('paceIntervalPresetRow');
+  const marathonPresetList = document.getElementById('paceMarathonPresetList');
+  if (!intervalPaceInput || !intervalList || !intervalPresetRow || !marathonPresetList) return;
+
+  intervalPaceInput.value = paceState.intervalTargetPace;
+  const targetPaceSec = parseClock(paceState.intervalTargetPace);
+  const distances = [100, 200, 400, 800, 1000];
+
+  const presetButtons = INTERVAL_PACE_PRESETS.map((value) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'pace-chip';
+    button.textContent = value;
+    button.addEventListener('click', () => {
+      paceState.intervalTargetPace = value;
+      renderPaceInterval();
+    });
+    return button;
+  });
+  fillNode(intervalPresetRow, presetButtons);
+
+  if (targetPaceSec) {
+    const intervalStats = distances.map((distance) => {
+      const lapSec = distance === 1000 ? targetPaceSec : targetPaceSec * (distance / 1000);
+      return {
+        label: `${distance}m`,
+        value: formatTime(lapSec)
+      };
+    });
+    intervalList.innerHTML = intervalStats.map((item) => `
+      <div class="pace-list-row">
+        <div class="pace-row-label">${item.label} 목표</div>
+        <div class="pace-row-value">${item.value}</div>
+      </div>
+    `).join('');
+  } else {
+    intervalList.innerHTML = `<div class="pace-empty">목표 페이스를 입력하면 100m, 200m, 400m, 800m, 1km 목표 기록이 계산됩니다.</div>`;
+  }
+
+  const marathonPresetButtons = PACE_MARATHON_PRESETS.map((item) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'pace-chip';
+    button.textContent = item.label;
+    button.addEventListener('click', () => {
+      paceState.intervalTargetPace = paceToInput((item.hours * 3600) / 42.195);
+      renderPaceInterval();
+    });
+    return button;
+  });
+  fillNode(marathonPresetList, marathonPresetButtons);
+}
+
+function setPaceIntervalDistance(value) {
+  paceState.intervalDistance = value;
+  renderPaceInterval();
+}
+
+function bindPaceEvents() {
+  document.getElementById('paceInputValue')?.addEventListener('input', (event) => {
+    paceState.inputValue = event.target.value;
+    renderPaceConverter();
+  });
+  document.getElementById('paceIntervalTargetPace')?.addEventListener('input', (event) => {
+    paceState.intervalTargetPace = event.target.value;
+    renderPaceInterval();
+  });
+  document.getElementById('paceGoalDistance')?.addEventListener('change', (event) => {
+    setPaceGoalDistance(event.target.value);
+  });
+  document.getElementById('paceGoalTime')?.addEventListener('input', (event) => {
+    setPaceGoalTime(event.target.value);
+  });
 }
 
 // ===== SETTINGS =====
@@ -1090,6 +2841,7 @@ function saveSettings() {
   cfg.pitch = parseFloat(document.getElementById('pitchRange').value);
   cfg.vol = parseFloat(document.getElementById('volRange').value);
   cfg.workCue = document.getElementById('workCue').value;
+  cfg.restCueEnabled = document.getElementById('restCueEnabled').checked;
   cfg.restCue = document.getElementById('restCue').value;
   cfg.countdownCue = document.getElementById('countdownCue').value;
   cfg.countdownCueEnabled = document.getElementById('countdownCueEnabled').checked;
@@ -1104,8 +2856,6 @@ function saveSettings() {
   persistSettings();
 
   resetTimer();
-  showTab('timer', document.querySelector('.tab-btn'));
-  document.querySelectorAll('.tab-btn')[1].classList.remove('active');
 }
 
 // ===== SPEECH =====
@@ -1132,11 +2882,17 @@ function testSpeak(type) {
   unlockAudio();
   // TTS는 반드시 사용자 제스처 직접 호출에서만 동작
   const texts = {
-    work: parseCue(document.getElementById('workCue').value, 1),
-    rest: parseCue(document.getElementById('restCue').value, 1),
-    complete: document.getElementById('completeCue').value
+    work: parseCue(document.getElementById('workCue').value, 1, 'work'),
+    rest: parseCue(document.getElementById('restCue').value, 1, 'rest'),
+    complete: parseCue(document.getElementById('completeCue').value, cfg.rounds, 'complete')
   };
   const beepTypes = { work: 'work', rest: 'rest', complete: 'complete' };
+  if (!texts[type]) {
+    texts[type] = String(document.getElementById(type + 'Cue')?.value || '')
+      .split('\n')
+      .map(line => line.replace(/^\[(first|early|mid|late|last|any|skip)\]\s*/i, '').trim())
+      .find(Boolean) || '';
+  }
   if (TTS) TTS.cancel();
   speak(texts[type], false, beepTypes[type]);
 }
@@ -1144,10 +2900,11 @@ function testSpeak(type) {
 function speakRep(n) {
   if (!TTS || !cfg.voiceEnabled) return;
   try {
+    // Rep count is low priority: never interrupt another cue that's already speaking.
+    if (TTS.speaking || TTS.pending) return;
     const text = cfg.repCue
       .replace(/\{count\}/g, n)
       .replace(/\{total\}/g, cfg.repTotal);
-    if (TTS.speaking) TTS.cancel();
     const utt = new SpeechSynthesisUtterance(text);
     const v = voices[cfg.voiceIdx];
     if (v) utt.voice = v;
@@ -1226,8 +2983,64 @@ function toggleCountOptions() {
   document.getElementById('countOptions').style.display = on ? 'flex' : 'none';
 }
 
-function parseCue(text, round) {
-  return text.replace('{round}', round).replace('{total}', cfg.rounds);
+function getCueStage(round) {
+  if (round <= 1) return 'first';
+  if (round >= cfg.rounds) return 'last';
+  const third = Math.max(1, Math.ceil(cfg.rounds / 3));
+  if (round <= third) return 'early';
+  if (round > cfg.rounds - third) return 'late';
+  return 'mid';
+}
+
+function pickCueVariant(text, round, cueType) {
+  const lines = String(text)
+    .split('\n')
+    .map(line => line.trim())
+    .filter(Boolean);
+
+  if (lines.length <= 1) {
+    return (lines[0] || String(text).trim())
+      .replace(/^\[(first|early|mid|late|last|any|skip)\]\s*/i, '')
+      .trim();
+  }
+
+  const stage = getCueStage(round);
+  const parsed = lines.map((line) => {
+    const match = line.match(/^\[(first|early|mid|late|last|any|skip)\]\s*/i);
+    return {
+      tag: match ? match[1].toLowerCase() : null,
+      text: line.replace(/^\[(first|early|mid|late|last|any|skip)\]\s*/i, '').trim()
+    };
+  });
+
+  let candidates = parsed.filter(item => item.tag === stage || item.tag === 'any' || item.tag === 'skip');
+  if (!candidates.length) {
+    candidates = parsed.filter(item => !item.tag);
+  }
+  if (!candidates.length) {
+    candidates = parsed;
+  }
+
+  const history = cueHistory[cueType] || [];
+  const filtered = candidates.filter(item => !history.includes(item.text));
+  const pool = filtered.length ? filtered : candidates;
+  const picked = pool[Math.floor(Math.random() * pool.length)];
+
+  if (cueHistory[cueType]) {
+    cueHistory[cueType] = [picked.text, ...history].slice(0, 2);
+  }
+
+  return picked.text;
+}
+
+function parseCue(text, round, cueType = 'generic') {
+  const selected = pickCueVariant(text, round, cueType);
+  return selected
+    .replace(/\{round\}/g, round)
+    .replace(/\{total\}/g, cfg.rounds)
+    .replace(/\{rest\}/g, cfg.rest)
+    .replace(/\{work\}/g, cfg.work)
+    .replace(/\{next\}/g, Math.min(cfg.rounds, round + 1));
 }
 
 // ===== TIMER CORE =====
@@ -1248,6 +3061,7 @@ function setPhaseUI(phase, timeLeft, totalDur, round) {
   const ringEl = document.getElementById('ringProgress');
   const barEl = document.getElementById('voiceCueBar');
   const cueEl = document.getElementById('voiceCueText');
+  const stageEl = document.querySelector('.timer-stage');
 
   numEl.textContent = timeLeft;
 
@@ -1255,31 +3069,38 @@ function setPhaseUI(phase, timeLeft, totalDur, round) {
   const circ = 754;
   ringEl.style.strokeDashoffset = circ * (1 - progress);
 
+  if (stageEl) {
+    stageEl.classList.remove('state-prep', 'state-work', 'state-rest');
+  }
+
   if (phase === 'work') {
-    labelEl.textContent = '운 동';
+    labelEl.textContent = '지금 나를 위한 시간';
     labelEl.className = 'phase-label work';
     numEl.className = 'time-num work';
     ringEl.className = 'ring-progress work';
     barEl.className = 'voice-cue-bar work';
-    cueEl.textContent = parseCue(cfg.workCue, round);
+    cueEl.textContent = state.currentCueText ?? parseCue(cfg.workCue, round, 'work');
     cueEl.className = 'voice-cue-text active';
     document.getElementById('roundInfo').textContent = `라운드 ${round} / ${cfg.rounds}`;
+    if (stageEl) stageEl.classList.add('state-work');
   } else if (phase === 'rest') {
-    labelEl.textContent = '휴 식';
+    labelEl.textContent = '잠깐 숨 고르기';
     labelEl.className = 'phase-label rest';
     numEl.className = 'time-num rest';
     ringEl.className = 'ring-progress rest';
     barEl.className = 'voice-cue-bar rest';
-    cueEl.textContent = parseCue(cfg.restCue, round);
+    cueEl.textContent = state.currentCueText ?? parseCue(cfg.restCue, round, 'rest');
     cueEl.className = 'voice-cue-text active';
+    if (stageEl) stageEl.classList.add('state-rest');
   } else if (phase === 'prep') {
-    labelEl.textContent = '준 비';
+    labelEl.textContent = '시작할 준비 됐어요';
     labelEl.className = 'phase-label ready';
     numEl.className = 'time-num ready';
     ringEl.className = 'ring-progress ready';
     barEl.className = 'voice-cue-bar';
-    cueEl.textContent = '준비하세요!';
+    cueEl.textContent = '좋아요. 천천히 호흡하고 첫 세트를 시작해요';
     cueEl.className = 'voice-cue-text active';
+    if (stageEl) stageEl.classList.add('state-prep');
   }
 }
 
@@ -1321,15 +3142,16 @@ function startTimer() {
 function startPrep() {
   state.phase = 'prep';
   state.running = true;
+  state.currentCueText = '좋아요. 천천히 호흡하고 첫 세트를 시작해요';
   document.getElementById('startBtn').textContent = '⏸';
-  document.getElementById('statusLine').textContent = '준비 카운트다운 중...';
+  document.getElementById('statusLine').textContent = '호흡을 정리하고 첫 세트를 준비해요';
 
   let prepLeft = cfg.prep;
   document.getElementById('countdownOverlay').classList.add('show');
   document.getElementById('countdownNum').textContent = prepLeft;
 
   setPhaseUI('prep', prepLeft, cfg.prep, 0);
-  speak('준비하세요', true, null);
+  speak('좋아요. 시작할 준비 됐어요', true, null);
 
   state.timer = setInterval(() => {
     if (!state.running) return;
@@ -1349,13 +3171,14 @@ function startWork() {
   state.currentRound++;
   state.phase = 'work';
   let timeLeft = cfg.work;
-  let warned3 = false;
+  const workCueText = parseCue(cfg.workCue, state.currentRound, 'work');
+  state.currentCueText = workCueText;
 
   flash('work');
-  speak(parseCue(cfg.workCue, state.currentRound), true, 'work');
+  if (workCueText) speak(workCueText, true, 'work');
   setPhaseUI('work', timeLeft, cfg.work, state.currentRound);
   updateDots(state.currentRound);
-  document.getElementById('statusLine').textContent = `🔥 운동 중 — 라운드 ${state.currentRound}/${cfg.rounds}`;
+  document.getElementById('statusLine').textContent = `좋아요, 라운드 ${state.currentRound}/${cfg.rounds}. 지금 페이스 아주 좋아요`;
 
   // 1초 메인 타이머 (UI 업데이트 + 3초 경고)
   state.timer = setInterval(() => {
@@ -1363,10 +3186,7 @@ function startWork() {
     state.totalTime++;
     timeLeft--;
 
-    if (cfg.countdownCueEnabled && timeLeft === 3 && !warned3) {
-      warned3 = true;
-      speak(cfg.countdownCue, false, 'warning');
-    } else if (!cfg.repEnabled && cfg.countAnnounce && timeLeft > 3 && timeLeft > 0
+    if (!cfg.repEnabled && cfg.countAnnounce && timeLeft > 3 && timeLeft > 0
       && (cfg.countPhase === 'work' || cfg.countPhase === 'both')
       && cfg.countInterval > 0 && timeLeft % cfg.countInterval === 0) {
       speakCount(timeLeft);
@@ -1402,11 +3222,13 @@ function startRest() {
   state.phase = 'rest';
   let timeLeft = cfg.rest;
   let warned3 = false;
+  const restCueText = cfg.restCueEnabled ? parseCue(cfg.restCue, state.currentRound, 'rest') : '';
+  state.currentCueText = restCueText;
 
   flash('rest');
-  speak(parseCue(cfg.restCue, state.currentRound), true, 'rest');
+  if (restCueText) speak(restCueText, true, 'rest');
   setPhaseUI('rest', timeLeft, cfg.rest, state.currentRound);
-  document.getElementById('statusLine').textContent = `💤 휴식 중 — 다음 라운드 ${state.currentRound + 1}/${cfg.rounds}`;
+  document.getElementById('statusLine').textContent = `좋아요, 잠깐 쉬고 다음 라운드 ${state.currentRound + 1}/${cfg.rounds}로 가요`;
 
   state.timer = setInterval(() => {
     if (!state.running) return;
@@ -1415,7 +3237,7 @@ function startRest() {
 
     if (cfg.countdownCueEnabled && timeLeft === 3 && !warned3) {
       warned3 = true;
-      speak(cfg.countdownCue, false, 'warning');
+      speak(parseCue(cfg.countdownCue, state.currentRound, 'countdown'), false, null);
     } else if (cfg.countAnnounce && timeLeft > 3 && timeLeft > 0
       && (cfg.countPhase === 'rest' || cfg.countPhase === 'both')
       && cfg.countInterval > 0 && timeLeft % cfg.countInterval === 0) {
@@ -1435,7 +3257,7 @@ function pauseTimer() {
   clearTimeout(state.repTimer);
   state.repTimer = null;
   document.getElementById('startBtn').textContent = '▶';
-  document.getElementById('statusLine').textContent = '⏸ 일시정지';
+  document.getElementById('statusLine').textContent = '잠깐 멈췄어요. 준비되면 다시 이어가요';
   if (TTS) try { TTS.cancel(); } catch(e) {}
 }
 
@@ -1443,8 +3265,8 @@ function resumeTimer() {
   state.running = true;
   document.getElementById('startBtn').textContent = '⏸';
   document.getElementById('statusLine').textContent = state.phase === 'work'
-    ? `🔥 운동 중 — 라운드 ${state.currentRound}/${cfg.rounds}`
-    : `💤 휴식 중`;
+    ? `좋아요, 라운드 ${state.currentRound}/${cfg.rounds}. 다시 리듬을 이어가요`
+    : `숨 고르고 있어요. 곧 다시 시작해요`;
 }
 
 function resetTimer() {
@@ -1454,9 +3276,10 @@ function resetTimer() {
   document.getElementById('countdownOverlay').classList.remove('show');
   document.getElementById('completeOverlay').classList.remove('show');
 
-  state = { running: false, phase: 'idle', timeLeft: 0, currentRound: 0, totalTime: 0, timer: null, repTimer: null };
+  state = { running: false, phase: 'idle', timeLeft: 0, currentRound: 0, totalTime: 0, timer: null, repTimer: null, currentCueText: null };
 
-  document.getElementById('phaseLabel').textContent = '준비 완료';
+  document.querySelector('.timer-stage')?.classList.remove('state-prep', 'state-work', 'state-rest');
+  document.getElementById('phaseLabel').textContent = '시작할 준비 됐어요';
   document.getElementById('phaseLabel').className = 'phase-label';
   document.getElementById('timeNum').textContent = cfg.work;
   document.getElementById('timeNum').className = 'time-num';
@@ -1464,8 +3287,8 @@ function resetTimer() {
   document.getElementById('ringProgress').className = 'ring-progress ready';
   document.getElementById('roundInfo').textContent = `라운드 — / ${cfg.rounds}`;
   document.getElementById('startBtn').textContent = '▶';
-  document.getElementById('statusLine').textContent = '시작 버튼을 눌러 타바타를 시작하세요';
-  document.getElementById('voiceCueText').textContent = '음성 안내가 여기 표시됩니다';
+  document.getElementById('statusLine').textContent = '오늘도 내 리듬으로, 시작 버튼만 누르면 돼요';
+  document.getElementById('voiceCueText').textContent = '좋아요. 한 번에 완벽할 필요 없이 오늘 한 세트면 충분해요';
   document.getElementById('voiceCueText').className = 'voice-cue-text';
   document.getElementById('voiceCueBar').className = 'voice-cue-bar';
   buildDots();
@@ -1502,7 +3325,7 @@ function finishTabata() {
     if (d) d.className = 'dot done';
   }
 
-  speak(cfg.completeCue, true, 'complete');
+  speak(parseCue(cfg.completeCue, cfg.rounds, 'complete'), true, 'complete');
   document.getElementById('startBtn').textContent = '▶';
 
   const mins = Math.floor(state.totalTime / 60);
@@ -1510,7 +3333,7 @@ function finishTabata() {
   document.getElementById('completeStats').innerHTML =
     `총 운동 시간: ${mins}분 ${secs}초\n운동: ${cfg.work}초 × ${cfg.rounds}라운드\n휴식: ${cfg.rest}초 × ${cfg.rounds - 1}회`;
   document.getElementById('completeOverlay').classList.add('show');
-  document.getElementById('statusLine').textContent = '✅ 완료!';
+  document.getElementById('statusLine').textContent = '오늘도 해냈어요. 이 루틴은 분명 쌓이고 있어요';
 }
 
 function closeComplete() {
@@ -1524,6 +3347,7 @@ function syncSettingsToUI() {
   document.getElementById('pitchRange').value = String(cfg.pitch);
   document.getElementById('volRange').value = String(cfg.vol);
   document.getElementById('workCue').value = cfg.workCue;
+  document.getElementById('restCueEnabled').checked = cfg.restCueEnabled;
   document.getElementById('restCue').value = cfg.restCue;
   document.getElementById('countdownCue').value = cfg.countdownCue;
   document.getElementById('countdownCueEnabled').checked = cfg.countdownCueEnabled;
@@ -1548,9 +3372,25 @@ function syncSettingsToUI() {
 }
 
 syncSettingsToUI();
+renderPaceConverter();
+bindPaceEvents();
+restoreActiveTab();
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
+    const isLocalHost = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+
+    if (isLocalHost) {
+      navigator.serviceWorker.getRegistrations()
+        .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+        .then(() => caches.keys())
+        .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+        .catch((err) => {
+          console.warn('Service worker cleanup failed:', err);
+        });
+      return;
+    }
+
     navigator.serviceWorker.register('./sw.js').catch((err) => {
       console.warn('Service worker registration failed:', err);
     });
