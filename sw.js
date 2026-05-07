@@ -1,10 +1,10 @@
-const CACHE_NAME = 'tabata-voice-coach-v2';
+const CACHE_NAME = 'tabata-voice-coach-v3';
 const APP_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './icons/icon-app.svg',
-  './icons/icon-maskable.svg'
+  './icons/icon-app.png',
+  './icons/icon-maskable.png'
 ];
 
 self.addEventListener('install', (event) => {

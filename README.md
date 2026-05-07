@@ -1,4 +1,4 @@
-# TABATA Voice Coach
+# 몸짱 김여사
 
 음성 안내와 함께 쓰는 설치형 타바타 타이머입니다.  
 현재 앱은 [index.html](/home/engis/workspace/deploy/tabata-voice-coach/index.html) 한 파일을 중심으로 동작하며, 타이머 기능과 러닝 페이스 계산 기능이 함께 들어 있습니다.

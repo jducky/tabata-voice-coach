@@ -1,6 +1,6 @@
 {
-  "name": "TABATA Voice Coach",
-  "short_name": "TABATA",
+  "name": "몸짱 김여사",
+  "short_name": "몸짱 김여사",
   "description": "음성 안내와 함께 사용하는 설치형 타바타 타이머",
   "lang": "ko-KR",
   "start_url": "./",
@@ -11,15 +11,15 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "icons/icon-app.svg",
+      "src": "icons/icon-app.png?v=20260504",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-maskable.svg",
+      "src": "icons/icon-maskable.png?v=20260504",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "maskable"
     }
   ]
