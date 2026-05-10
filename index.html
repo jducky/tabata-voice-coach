@@ -1518,6 +1518,31 @@
     animation: pulse 1s ease-in-out infinite;
   }
 
+  .countdown-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 6px;
+  }
+
+  .countdown-btn {
+    min-width: 112px;
+    padding: 12px 16px;
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 16px;
+    background: rgba(255,255,255,0.08);
+    color: #fff8f2;
+    font: 800 16px 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  }
+
+  .countdown-btn:hover {
+    transform: translateY(-1px);
+    background: rgba(255,255,255,0.12);
+  }
+
   @keyframes pulse {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.06); }
@@ -1552,11 +1577,44 @@
 
   .complete-overlay.show { display: flex; }
 
+  .complete-overlay.playful {
+    background:
+      radial-gradient(circle at top right, rgba(255, 126, 165, 0.2), transparent 30%),
+      radial-gradient(circle at bottom left, rgba(72, 203, 183, 0.16), transparent 28%),
+      rgba(79, 49, 67, 0.88);
+  }
+
+  .complete-avatar {
+    display: none;
+    width: 110px;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 28px;
+    background: rgba(255,255,255,0.12);
+    box-shadow: 0 16px 36px rgba(255, 126, 165, 0.24);
+  }
+
+  .complete-overlay.playful .complete-avatar {
+    display: block;
+  }
+
   .complete-title {
     font: 800 clamp(42px, 8vw, 60px) 'Noto Sans KR', sans-serif;
     line-height: 1.02;
     letter-spacing: -0.03em;
     color: #fff8f2;
+  }
+
+  .complete-copy {
+    display: none;
+    max-width: 420px;
+    color: rgba(255,248,242,0.9);
+    font: 700 18px 'Noto Sans KR', sans-serif;
+    line-height: 1.5;
+  }
+
+  .complete-overlay.playful .complete-copy {
+    display: block;
   }
 
   .complete-stats {
@@ -2601,12 +2659,18 @@
 <div class="countdown-overlay" id="countdownOverlay">
   <div class="countdown-label">준비하세요</div>
   <div class="countdown-num" id="countdownNum">5</div>
+  <div class="countdown-actions">
+    <button class="countdown-btn" type="button" onclick="toggleTimer()">멈춤</button>
+    <button class="countdown-btn" type="button" onclick="skipPhase()">바로 시작</button>
+  </div>
 </div>
 
 <div class="flash-overlay" id="flashOverlay"></div>
 
 <div class="complete-overlay" id="completeOverlay">
-  <div class="complete-title">WELL DONE!</div>
+  <img class="complete-avatar" id="completeAvatar" src="docs/kimzzang.png" alt="몸짱 김여사 캐릭터">
+  <div class="complete-title" id="completeTitle">WELL DONE!</div>
+  <div class="complete-copy" id="completeCopy"></div>
   <div class="complete-stats" id="completeStats"></div>
   <button class="complete-btn" onclick="closeComplete()">다시 시작</button>
 </div>
@@ -2675,11 +2739,13 @@ const WORKOUT_TEMPLATES_KEY = 'tabata-voice-coach-templates-v1';
 const WORKOUT_LOGS_KEY = 'tabata-voice-coach-logs-v1';
 const ACTIVE_WORKOUT_KEY = 'tabata-voice-coach-active-workout-v1';
 const BACKUP_SCHEMA_VERSION = 1;
+const COMPLETE_VARIANT_KEY = 'tabata-voice-coach-complete-variant-v1';
 let workoutTemplates = [];
 let workoutLogs = [];
 let activeWorkoutId = '';
 let calendarMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 let selectedLogDate = formatDateKey(new Date());
+let lastCompleteVariant = 'playful';
 const LEGACY_CUES = {
   workCue: [
     '{round}라운드! 시작!',
@@ -2787,6 +2853,12 @@ function loadSettings() {
   } catch (e) {
     console.warn('Failed to load settings:', e);
   }
+}
+
+try {
+  lastCompleteVariant = localStorage.getItem(COMPLETE_VARIANT_KEY) || 'playful';
+} catch (e) {
+  console.warn('Failed to load complete variant state:', e);
 }
 
 function persistSettings() {
@@ -4414,7 +4486,7 @@ function setPhaseUI(phase, timeLeft, totalDur, round) {
     numEl.className = 'time-num work';
     ringEl.className = 'ring-progress work';
     barEl.className = 'voice-cue-bar work';
-    cueEl.textContent = '🔥 리듬 좋았어요. 계속 가요';
+    cueEl.textContent = state.currentCueText || '🔥 리듬 좋았어요. 계속 가요';
     cueEl.className = 'voice-cue-text active';
     document.getElementById('roundInfo').textContent = `ROUND ${round} / ${cfg.rounds}`;
     if (stageEl) stageEl.classList.add('state-work');
@@ -4425,7 +4497,7 @@ function setPhaseUI(phase, timeLeft, totalDur, round) {
     numEl.className = 'time-num rest';
     ringEl.className = 'ring-progress rest';
     barEl.className = 'voice-cue-bar rest';
-    cueEl.textContent = `${cfg.rest}초 쉴게요`;
+    cueEl.textContent = state.currentCueText || `${cfg.rest}초 쉴게요`;
     cueEl.className = 'voice-cue-text active';
     if (stageEl) stageEl.classList.add('state-rest');
   } else if (phase === 'prep') {
@@ -4435,7 +4507,7 @@ function setPhaseUI(phase, timeLeft, totalDur, round) {
     numEl.className = 'time-num ready';
     ringEl.className = 'ring-progress ready';
     barEl.className = 'voice-cue-bar';
-    cueEl.textContent = '💗 김여사, 오늘도 시작! 💪';
+    cueEl.textContent = state.currentCueText || '💗 김여사, 오늘도 시작! 💪';
     cueEl.className = 'voice-cue-text active';
     if (stageEl) stageEl.classList.add('state-prep');
   }
@@ -4695,7 +4767,9 @@ function resumeTimer() {
   document.getElementById('startBtn').textContent = '⏸';
   document.getElementById('statusLine').textContent = state.phase === 'work'
     ? `ROUND ${state.currentRound}/${cfg.rounds}`
-    : '휴식';
+    : state.phase === 'prep'
+      ? '준비'
+      : '휴식';
   requestWakeLock();
   const callbacks = getPhaseTickerCallbacks();
   runPhaseTicker(callbacks.onSecond, callbacks.onComplete);
@@ -4765,6 +4839,33 @@ function skipPhase() {
   }
 }
 
+function pickCompleteCelebration(totalTimeSec) {
+  const shortMessages = [
+    { title: '김여사 번개처럼 끝냈다', copy: '짧게 치고 빠졌는데도 운동 체크 완료예요. 이 맛에 한 세트 하죠.' },
+    { title: '오늘도 한 판 깔끔하게', copy: '시간은 짧았는데 존재감은 꽤 컸어요. 오늘 루틴, 아주 예쁘게 찍혔습니다.' },
+    { title: '가볍게 했는데도 제법인데', copy: '짧아도 운동은 운동이죠. 김여사 오늘도 출석 도장 쾅입니다.' }
+  ];
+  const mediumMessages = [
+    { title: '김여사 오늘도 찢었다', copy: '한 세트 한다더니 끝까지 갔네요. 이 정도면 오늘 리듬 접수예요.' },
+    { title: '리듬 타더니 끝까지 갔네', copy: '중간에 안 끊고 여기까지 온 거, 그게 진짜 실력입니다.' },
+    { title: '오늘 운동, 꽤 제대로 했다', copy: '좋아요. 몸짱 포인트 또 하나 적립됐어요. 내일의 나도 꽤 기대됩니다.' },
+    { title: '체크 하나가 아니라 한 건 했다', copy: '이 맛에 체크 찍죠. 오늘 운동은 김여사 승리입니다.' }
+  ];
+  const longMessages = [
+    { title: '김여사 오늘 거의 선수 모드', copy: '이 정도 길이면 진짜 운동했어요. 오늘 기록은 꽤 뿌듯해해도 됩니다.' },
+    { title: '와, 오늘은 진짜 크게 해냈다', copy: '짧은 루틴이 아니라 제대로 한 판 끝낸 날이에요. 아주 묵직하게 잘 갔습니다.' },
+    { title: '오늘 한 세트가 아니라 한 작품', copy: '끝까지 밀고 온 거 보면 오늘 컨디션도, 의지도 둘 다 좋았던 겁니다.' }
+  ];
+
+  const pool = totalTimeSec < 180
+    ? shortMessages
+    : totalTimeSec < 600
+      ? mediumMessages
+      : longMessages;
+
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
 function finishTabata() {
   clearPhaseTimer();
   clearTimeout(state.repTimer);
@@ -4784,6 +4885,20 @@ function finishTabata() {
 
   const mins = Math.floor(state.totalTime / 60);
   const secs = state.totalTime % 60;
+  const overlayEl = document.getElementById('completeOverlay');
+  const titleEl = document.getElementById('completeTitle');
+  const copyEl = document.getElementById('completeCopy');
+  const selectedVariant = pickCompleteCelebration(state.totalTime);
+  lastCompleteVariant = 'playful';
+  try {
+    localStorage.setItem(COMPLETE_VARIANT_KEY, lastCompleteVariant);
+  } catch (e) {
+    console.warn('Failed to persist complete variant state:', e);
+  }
+  if (overlayEl) overlayEl.classList.add('playful');
+  if (titleEl) titleEl.textContent = selectedVariant.title;
+  if (copyEl) copyEl.textContent = selectedVariant.copy;
+
   saveWorkoutLog();
   updateSessionStats();
   document.getElementById('completeStats').innerHTML =
@@ -4794,6 +4909,7 @@ function finishTabata() {
 
 function closeComplete() {
   document.getElementById('completeOverlay').classList.remove('show');
+  document.getElementById('completeOverlay').classList.remove('playful');
   resetTimer();
 }
 
